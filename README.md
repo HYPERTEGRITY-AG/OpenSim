@@ -1,4 +1,4 @@
-# citysim.py
+# CitySim
 
 Copyright (c) 2021 Will Freitag, Version: 1.0.0
 
