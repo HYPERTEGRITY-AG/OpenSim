@@ -1,6 +1,6 @@
 # HowTo: Use min.io-Server for Uploading Blobs and Store the URIs in Orion Context Broker/FROST-Server
 
-This short description will help with _first steps_ with min.io-Server and how to utilize the document-store together with datasim.py.
+This short description will help with _first steps_ with min.io-Server and how to utilize the document-store together with citysim.py.
 
 ## Prerequisites
 * An up and running min.io-Server (e.g. `https://blob.myserver.com` - referred as `HOST` later on)
@@ -35,13 +35,13 @@ Note: Any prepending directory from `LOCAL_FILE` (e.g.: `/subdir/filename`) is c
 Also note: Repeatedly uploads will overwrite an exiting file. 
 
 ## Store the URI in Orion Context Broker/FROST-Server
-Afterwards, the URI can be sent to Orion Context Broker/FROST-Server via _datasim.py_ using a String-Attribute:  
+Afterwards, the URI can be sent to Orion Context Broker/FROST-Server via _citysim.py_ using a String-Attribute:  
 ```commandline
-$ datasim.py ... --attribute-string "Name of the attribute" "URI"
+$ citysim.py ... --attribute-string "Name of the attribute" "URI"
 ```
 Example:  
 ```commandline
-$ datasim.py -s http://myserver.com -p SensorThings-HTTP -as Picture https://blob.myserver.com/images/1.jpg
+$ citysim.py -s http://myserver.com -p SensorThings-HTTP -as Picture https://blob.myserver.com/images/1.jpg
 ```
 
 ## Do Both, Upload and Store in One Step
