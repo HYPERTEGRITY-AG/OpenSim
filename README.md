@@ -2,10 +2,17 @@
 
 Copyright (c) 2021 Will Freitag, Version: 1.0.0
 
-citysim.py is a lightweight tool to "talk" to an Orion Context Broker or FROST-Server respectively. \
+## TL;DR
+_citysim.py_ is a lightweight tool to send test data to an Orion Context Broker or FROST-Server respectively. \
 It can be used to send just a single message to test your installation and also to send thousands of messages in multiple threads in order to stress your installation. \
 Creation of test-data w/o integrating any sensors is another aspect that can be handled with this tool. \
-For this to end, not the complete APIs of both, Orion and FROST are implemented (it's not an Orion- or FROST-Client!), but the API needed to send Data (Contexts and Things/Datastreams/Observations resp.) is in place. 
+For this to end, not the complete APIs of both, Orion and FROST are implemented (it's not an Orion- or FROST-Client!), but the API needed to send Data (Contexts and Things/Datastreams/Observations resp.) is in place.  
+
+A simple call of this tool like...
+```commandline
+$ ./citysim.py -s http://myserver.com -p NGSI -ad dateObserved -an temperature,f,20.5
+```
+...will send one context to an Orion Context Broker at myserver.com with a payload defining a weather observation (date and temperature).
 
 ## Why Not Simply Use "curl" or "Postman/Newman"?
 While it's easy to think about a shell script, that runs curl in a loop adding data via the backend's REST-Api, one important drawback is, that if your server is TLS-secured ('https://...), curl isn't able to cache that TLS-handshake. That means, that EVERY call will do this handshake ending up in response times like one or more seconds. It's hard to generate load this way with hundreds of messages per second. Putting more than one URL in a single curl is a solution for this, but it's hard to aggregate the results and what, if there is more logic needed (e.g. Call this URL after that URL, but only if the first call gave you an 404...)  
