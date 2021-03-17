@@ -12,8 +12,155 @@ A simple call of this tool like...
 ```commandline
 $ ./citysim.py -s http://myserver.com -p NGSI -ad dateObserved -an temperature,f,20.5
 ```
-...will send one context to an Orion Context Broker at myserver.com with a payload defining a weather observation (date and temperature).
+...will send one context to an Orion Context Broker at myserver.com with a payload defining a weather observation (date and temperature).  
+And if you don't want to read this documentation at all: Remember that you can use --help at any time! :-)
+```commandline
+$ ./citysim.py -h
+citysim.py, Copyright (c) 2021 Will Freitag, Version 1.0.0
+usage: citysim.py [-h] -s
+                  [protocol]host-name [-p {NGSI,SensorThings-MQTT,SensorThings-HTTP}]
+                  [-i] [-a id] [-x API-Key | -b token] [-f id] [-e PREFIX]
+                  [-o POSTFIX] [-c] [-n num] [-m num] [-u] [-q milliseconds]
+                  [-l seconds] [-t name] [-y name]
+                  [-an name,type,number[,max-number]] [-as name value]
+                  [-ad name] [-al name,lat,long[,max-lat,max-long]]
+                  [-ab name value] [-ai indent] [-r] [-v] [-d from to]
 
+Tool to create some load on Orion Context Broker/FROST-Server.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s [protocol]host-name, --server [protocol]host-name
+                        This host-name will be prepended by "https://", if
+                        protocol is omitted and appended with
+                        "/v2/entities/[?options=upsert]" or "/v1.1/..." resp.
+                        depending on the server-type (-p/--protocol).
+  -p {NGSI,SensorThings-MQTT,SensorThings-HTTP}, --protocol {NGSI,SensorThings-MQTT,SensorThings-HTTP}
+                        Define the type of server. [Default: NGSI]
+  -i, --insert-always   [Only NGSI!] If set, the contexts will always be
+                        inserted (via POST with option 'upsert') instead of
+                        trying to update first (via PATCH) and insert (via POST
+                        w/o option 'upsert'), if not existing (i.e. PATCH
+                        returns '404 Not Found').
+  -a id, --datastream-id id
+                        [Only SensorThings!] If set, this Datastream-Id will be
+                        used for ALL Observations, instead of first searching
+                        for the Thing by it's name and the correct Datastream-Id
+                        afterwards.
+  -x API-Key, --x-api-key API-Key
+                        Define an X-API-KEY (Will be used in the header as
+                        'X-Gravitee-Api-Key').
+  -b token, --bearer token
+                        Define a bearer token (Will be used in the header as
+                        'Authorization' with a prepended 'Bearer ').
+  -f id, --first-id id  Define the first id to be used or the one to be used if
+                        '-c/--static-id' is set. [Default: 1]
+  -e PREFIX, --prefix PREFIX
+                        If set, the prefix will be prepended to the generated
+                        id.
+  -o POSTFIX, --postfix POSTFIX
+                        If set, the postfix will be appended to the generated
+                        id.
+  -c, --static-id       If set, the id will not increment (i.e. -n times -m
+                        messages will be sent with the same id ['-f/--first-id'
+                        or '1' if omitted]).
+  -n num, --num-threads num
+                        Define, how many threads shall be used. [Default: 1]
+  -m num, --messages num
+                        Define, how many messages per thread shall be sent
+                        (ignored, if '-u/--unlimited' ist set). [Default: 1]
+  -u, --unlimited       If set, '-m/--messages' is ignored and infinite messages
+                        will be send (in '-n/--num-threads' threads). Hit
+                        'Ctrl-C' to interrupt or set '-l/--limit-time'.
+  -q milliseconds, --frequency milliseconds
+                        If set, limits the frequency of the messages sent to the
+                        given number (per thread!).
+  -l seconds, --limit-time seconds
+                        Only in conjunction with '-u/--unlimited': Stops after
+                        the given time in seconds.
+  -t name, --tenant name
+                        [Only NGSI!] This tenant-name will be used as service-
+                        name in Orion Context Broker.
+  -y name, --type name  [Only NGSI!] If set, this type-name will be used in the
+                        payload.
+  -an name,type,number[,max-number], --attribute-number name,type,number[,max-number]
+                        Define a number attribute used for the payload by 'name'
+                        (The name of the attribute, e.g.: temperature), 'type'
+                        (One of i [integer] or f [floating point])and 'number'
+                        (The value to be used). If 'max-number' is set, the
+                        number written will be randomly between 'number' and
+                        'max-number' (each including). Note: Multiple number
+                        attributes can be defined by repeating -an.
+  -as name value, --attribute-string name value
+                        Define a string attribute used for the payload by 'name'
+                        (The name of the attribute, e.g.: instruction) and
+                        'value' (the actual string). Note: Multiple string
+                        attributes can be defined by repeating -as.
+  -ad name, --attribute-date name
+                        [Only NGSI!] Define a DateTime attribute used for the
+                        payload by 'name' (The name of the attribute, e.g.:
+                        dateObserved). Note: The current time is used as value.
+                        Multiple DateTime attributes can be defined by repeating
+                        -ad.
+  -al name,lat,long[,max-lat,max-long], --attribute-location name,lat,long[,max-lat,max-long]
+                        [Only NGSI!] Define a location attribute used for the
+                        payload by 'name' (The name of the attribute, e.g.:
+                        position), 'lat' (The value for latitude) and 'long'
+                        (The value for longitude). If 'max-lat' and 'max-long'
+                        are set, the location written will be randomly between
+                        'lat' and 'max-lat' and 'long' and 'max-long' resp.
+                        (each including). Note: Multiple location attributes can
+                        be defined by repeating -al.
+  -ab name value, --attribute-boolean name value
+                        [Only NGSI!] Define a boolean attribute used for the
+                        payload by 'name' (The name of the attribute, e.g.:
+                        public) and 'value' (One of 'true', 'false' or 'toggle'
+                        [ie. randomly switch between true and false]). Note:
+                        Multiple boolean attributes can be defined by repeating
+                        -ab.
+  -ai indent, --attribute-indent indent
+                        Define the number of characters for indenting the
+                        created payload. [Default: 0]
+  -r, --dry-run         Do a dry run only - giving the chance to review what
+                        WOULD be done incl. seeing what the payload will look
+                        like.
+  -v, --verbose         Generate verbose output.
+  -d from to, --delete from to
+                        If set, the entities within the given range (including
+                        "from" and "to") will be deleted.
+
+Example #1:
+./citysim.py -s my-host.com -b 039ea6d72a2f32227c2110bd8d78aae33acd6782 -t
+curltest
+The id will be increased with every message sent (starting with [first-id]).
+The tenant ['curltest' in the example above] will be used as 'fiware-service' in
+the header of the post.
+
+Example #2:
+The payload that will be sent will be constructed from the -y and the -aX
+parameters. Example:
+./citysim.py -y WeatherObserved -an temperature,f,-20,50 -an
+precipitation,i,1,20 ...
+will generate a payload looking like:
+{
+  "id":"1",
+  "type":"WeatherObserved",
+  "temperature": {
+    "type": "Number",
+    "value": -2.3
+  },
+  "precipitation": {
+    "type": "Number",
+    "value": 13
+  },
+}
+
+Example #3:
+./citysim.py -d 100 200 -s my-host.com -b
+039ea6d72a2f32227c2110bd8d78aae33acd6782
+
+This will delete all IDs starting from 100 to 200 (inclusive).
+```
 ## Why Not Simply Use "curl" or "Postman/Newman"?
 While it's easy to think about a shell script, that runs curl in a loop adding data via the backend's REST-Api, one important drawback is, that if your server is TLS-secured ('https://...), curl isn't able to cache that TLS-handshake. That means, that EVERY call will do this handshake ending up in response times like one or more seconds. It's hard to generate load this way with hundreds of messages per second. Putting more than one URL in a single curl is a solution for this, but it's hard to aggregate the results and what, if there is more logic needed (e.g. Call this URL after that URL, but only if the first call gave you an 404...)  
 
