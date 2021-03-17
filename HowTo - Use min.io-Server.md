@@ -69,7 +69,7 @@ URI=$HOST/$BUCKET/$REMOTE_FILE
 echo The URI is: $URI
 
 # 3) Store URI
-./datasim.py -s http://myserver.com -p SensorThings-HTTP -as Picture $URI
+./citysim.py -s http://myserver.com -p SensorThings-HTTP -as Picture $URI
 
 ```
 Feel free to enhance this script to make use of parameters (e.g filename to upload/store) or even loop over a directory and store all contained files.

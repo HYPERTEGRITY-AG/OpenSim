@@ -191,7 +191,7 @@ limit=10
 temperature=20
 i=1; while [ $i -le $limit ]; do
   echo "The current temperature is "$temperature
-  ./datasim.py -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,$temperature
+  ./citysim.py -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,$temperature
   temperature=$((temperature+1))
 i=$((i+1))
 sleep 60;
@@ -206,7 +206,7 @@ SET /A "temperature = 20"
 :while
 if %i% leq %limit% (
    echo The current temperature is %temperature%
-   datasim.py -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,%temperature%
+   citysim.py -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,%temperature%
    SET /A "temperature = temperature + 1"
    SET /A "i = i + 1"
    timeout /T 60 /nobreak > nul
