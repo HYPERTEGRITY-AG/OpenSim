@@ -6,7 +6,7 @@ from modules import helper
 
 
 def print_version():
-    print("citysim.py, Copyright (c) 2021 Will Freitag, Version %s" % helper.VERSION, flush=True)
+    print("opensim.py, Copyright (c) 2021 Will Freitag, Version %s" % helper.VERSION, flush=True)
 
 
 def print_delimiter():

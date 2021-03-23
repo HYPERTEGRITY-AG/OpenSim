@@ -37,14 +37,14 @@ def parse_arguments():
                                      allow_abbrev=False)
 
     parser.epilog = "Example #1:|n" \
-                    "./citysim.py -s my-host.com -b 039ea6d72a2f32227c2110bd8d78aae33acd6782 "\
+                    "./opensim.py -s my-host.com -b 039ea6d72a2f32227c2110bd8d78aae33acd6782 "\
                     "-t curltest|n" \
                     "The id will be increased with every message sent (starting with [first-id]).|n" \
                     "The tenant ['curltest' in the example above] will be used as 'fiware-service' in the " \
                     "header of the post.|n|n" \
                     "Example #2:|n" \
                     "The payload that will be sent will be constructed from the -y and the -aX parameters. Example:|n" \
-                    "./citysim.py -y WeatherObserved -an temperature,f,-20,50 "\
+                    "./opensim.py -y WeatherObserved -an temperature,f,-20,50 "\
                     "-an precipitation,i,1,20 ...|n" \
                     "will generate a payload looking like:|n" \
                     "{|n" \
@@ -61,7 +61,7 @@ def parse_arguments():
                     "}|n"
 
     parser.epilog += "|n|nExample #3:|n" \
-                     "./citysim.py -d 100 200 -s my-host.com "\
+                     "./opensim.py -d 100 200 -s my-host.com "\
                      "-b 039ea6d72a2f32227c2110bd8d78aae33acd6782|n" \
                      "|n" \
                      "This will delete all IDs starting from 100 to 200 (inclusive)."
