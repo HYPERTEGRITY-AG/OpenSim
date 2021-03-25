@@ -10,7 +10,8 @@ def print_version():
 
 
 def print_delimiter():
-    print("-----------------------------------------------------------------------------------------", flush=True)
+    print("----------------------------------------------"
+          "-------------------------------------------", flush=True)
 
 
 def print_duration(what, start, end):
@@ -63,15 +64,18 @@ def print_type_of_server(protocol):
 def print_schema(args):
     if args.protocol == helper.PROTOCOL_NGSI:
         if args.insert_always:
-            print("Note: POST-always schema is used to store contexts. (Use --help to get more information)",
+            print("Note: POST-always schema is used to store contexts. "
+                  "(Use --help to get more information)",
                   flush=True)
         else:
-            print("Note: PATCH/POST schema is used to store contexts. (Use --help to get more information)",
+            print("Note: PATCH/POST schema is used to store contexts. "
+                  "(Use --help to get more information)",
                   flush=True)
 
 
 def print_data_stream_id_used(datastream_id):
-    print("The Datastream-Id %i will be used for ALL Observations! (Use --help to get more information)" %
+    print("The Datastream-Id %i will be used for ALL Observations! "
+          "(Use --help to get more information)" %
           datastream_id,
           flush=True)
 
@@ -100,7 +104,9 @@ def print_id_used(args, msg_num):
 def print_payload(args):
     if args.protocol == helper.PROTOCOL_NGSI:
         if args.insert_always:
-            print("The payload will look like:\n%s" % helper.create_payload_ngsi(args.first_id, True, args),
+            print("The payload will look like:\n%s" % helper.create_payload_ngsi(args.first_id,
+                                                                                 True,
+                                                                                 args),
                   flush=True)
         else:
             print("The payload will look like:\n%s" % helper.create_payload_ngsi(None, False, args),
@@ -125,21 +131,25 @@ def print_will_delete(args):
 def print_will_send_messages(args, msg_num):
     if args.unlimited:
         if args.limit_time is not None:
-            print("Will send messages in %i thread(s) for %i seconds." % (args.num_threads, args.limit_time),
+            print("Will send messages in %i thread(s) for %i seconds." % (args.num_threads,
+                                                                          args.limit_time),
                   flush=True)
         else:
-            print("Will send infinite messages in %i thread(s). Hit 'Ctrl-C' to interrupt." % args.num_threads,
+            print("Will send infinite messages in %i thread(s). Hit 'Ctrl-C' to interrupt." %
+                  args.num_threads,
                   flush=True)
     else:
         if msg_num == 1:
             print("Will send one message.", flush=True)
         else:
-            print("Will send %i messages in %i thread(s)." % (msg_num, args.num_threads), flush=True)
+            print("Will send %i messages in %i thread(s)." % (msg_num, args.num_threads),
+                  flush=True)
 
 
 def print_frequency(frequency, more_than_one_thread):
     if more_than_one_thread:
-        print("The frequency of messages sent is limited to %i milliseconds (per thread!)." % frequency,
+        print("The frequency of messages sent is limited to %i milliseconds (per thread!)." %
+              frequency,
               flush=True)
     else:
         print("The frequency of messages sent is limited to %i milliseconds." % frequency,
@@ -159,7 +169,8 @@ def print_messages_send(overall_messages, errors, overall_time, ms, msg_num, unl
 
     if unlimited:
         # In this case, there is no percentage
-        msg = "\rMessages sent: %i with %i error(s), avg. response-time: %s ms, load: %i msg/sec      " % \
+        msg = "\rMessages sent: %i with %i error(s), " \
+              "avg. response-time: %s ms, load: %i msg/sec      " % \
               (overall_messages,
                errors,
                str(response_time) if response_time >= 0 else "--",
@@ -167,7 +178,8 @@ def print_messages_send(overall_messages, errors, overall_time, ms, msg_num, unl
     else:
         # Here we go with some percentage
         percentage = (overall_messages / msg_num) * 100
-        msg = "\rMessages sent: %i (%i%%) with %i error(s), avg. response-time: %s ms, load: %i msg/sec      " % \
+        msg = "\rMessages sent: %i (%i%%) with %i error(s), " \
+              "avg. response-time: %s ms, load: %i msg/sec      " % \
               (overall_messages,
                percentage,
                errors,

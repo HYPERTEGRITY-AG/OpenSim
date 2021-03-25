@@ -32,18 +32,22 @@ def parse_arguments():
             return multi_line_text
 
     # noinspection PyTypeChecker
-    parser = argparse.ArgumentParser(description="Tool to create some load on Orion Context Broker/FROST-Server.",
+    parser = argparse.ArgumentParser(description="Tool to create some load on Orion Context "
+                                                 "Broker/FROST-Server.",
                                      formatter_class=MultiLineFormatter,
                                      allow_abbrev=False)
 
     parser.epilog = "Example #1:|n" \
                     "./opensim.py -s my-host.com -b 039ea6d72a2f32227c2110bd8d78aae33acd6782 "\
                     "-t curltest|n" \
-                    "The id will be increased with every message sent (starting with [first-id]).|n" \
-                    "The tenant ['curltest' in the example above] will be used as 'fiware-service' in the " \
+                    "The id will be increased with every message sent (starting " \
+                    "with [first-id]).|n" \
+                    "The tenant ['curltest' in the example above] will be used " \
+                    "as 'fiware-service' in the " \
                     "header of the post.|n|n" \
                     "Example #2:|n" \
-                    "The payload that will be sent will be constructed from the -y and the -aX parameters. Example:|n" \
+                    "The payload that will be sent will be constructed from the -y and " \
+                    "the -aX parameters. Example:|n" \
                     "./opensim.py -y WeatherObserved -an temperature,f,-20,50 "\
                     "-an precipitation,i,1,20 ...|n" \
                     "will generate a payload looking like:|n" \
@@ -70,7 +74,8 @@ def parse_arguments():
                         '--server',
                         metavar='[protocol]host-name',
                         dest='server',
-                        help="This host-name will be prepended by \"https://\", if protocol is omitted and appended "
+                        help="This host-name will be prepended by \"https://\", if protocol "
+                             "is omitted and appended "
                              "with \"/v2/entities/[?options=upsert]\" or \"/v1.1/...\" resp. "
                              "depending on the server-type (-p/--protocol).",
                         required=True)
@@ -91,7 +96,8 @@ def parse_arguments():
                         default=False,
                         help="[Only NGSI!] If set, the contexts will always be inserted "
                              "(via POST with option 'upsert') instead "
-                             "of trying to update first (via PATCH) and insert (via POST w/o option 'upsert'), if not "
+                             "of trying to update first (via PATCH) and insert (via POST w/o "
+                             "option 'upsert'), if not "
                              "existing (i.e. PATCH returns '404 Not Found').")
 
     parser.add_argument('-a',
@@ -99,7 +105,8 @@ def parse_arguments():
                         metavar='id',
                         dest='datastream_id',
                         help="[Only SensorThings!] If set, this Datastream-Id will be used for ALL "
-                             "Observations, instead of first searching for the Thing by it's name and the correct "
+                             "Observations, instead of first searching for the Thing by it's name "
+                             "and the correct "
                              "Datastream-Id afterwards.",
                         type=int)
 
@@ -109,20 +116,23 @@ def parse_arguments():
                              '--x-api-key',
                              metavar='API-Key',
                              dest='x_api_key',
-                             help="Define an X-API-KEY (Will be used in the header as 'X-Gravitee-Api-Key').")
+                             help="Define an X-API-KEY (Will be used in the header "
+                                  "as 'X-Gravitee-Api-Key').")
 
     token_group.add_argument('-b',
                              '--bearer',
                              metavar='token',
                              dest='bearer',
-                             help="Define a bearer token (Will be used in the header as 'Authorization' with a "
+                             help="Define a bearer token (Will be used in the header "
+                                  "as 'Authorization' with a "
                                   "prepended 'Bearer ').")
 
     parser.add_argument('-f',
                         '--first-id',
                         metavar='id',
                         dest='first_id',
-                        help="Define the first id to be used or the one to be used if '-c/--static-id' is "
+                        help="Define the first id to be used or the one to be used "
+                             "if '-c/--static-id' is "
                              "set. [Default: 1]",
                         default=1,
                         type=int)
@@ -157,7 +167,8 @@ def parse_arguments():
                         '--messages',
                         metavar='num',
                         dest='num_messages',
-                        help="Define, how many messages per thread shall be sent (ignored, if '-u/--unlimited' "
+                        help="Define, how many messages per thread shall be "
+                             "sent (ignored, if '-u/--unlimited' "
                              "ist set). [Default: 1]",
                         default=1,
                         type=int)
@@ -167,7 +178,8 @@ def parse_arguments():
                         dest='unlimited',
                         action='store_true',
                         default=False,
-                        help="If set, '-m/--messages' is ignored and infinite messages will be send "
+                        help="If set, '-m/--messages' is ignored and infinite messages "
+                             "will be send "
                              "(in '-n/--num-threads' threads). "
                              " Hit 'Ctrl-C' to interrupt or set '-l/--limit-time'.")
 
@@ -175,21 +187,24 @@ def parse_arguments():
                         '--frequency',
                         metavar='milliseconds',
                         dest='frequency',
-                        help="If set, limits the frequency of the messages sent to the given number (per thread!).",
+                        help="If set, limits the frequency of the messages sent to the given "
+                             "number (per thread!).",
                         type=int)
 
     parser.add_argument('-l',
                         '--limit-time',
                         metavar='seconds',
                         dest='limit_time',
-                        help="Only in conjunction with '-u/--unlimited': Stops after the given time in seconds.",
+                        help="Only in conjunction with '-u/--unlimited': Stops after the given "
+                             "time in seconds.",
                         type=int)
 
     parser.add_argument('-t',
                         '--tenant',
                         metavar='name',
                         dest='tenant',
-                        help="[Only NGSI!] This tenant-name will be used as service-name in Orion Context Broker.")
+                        help="[Only NGSI!] This tenant-name will be used as service-name in "
+                             "Orion Context Broker.")
 
     parser.add_argument('-y',
                         '--type',
@@ -203,10 +218,14 @@ def parse_arguments():
                         dest='numbers',
                         action='append',
                         nargs=1,
-                        help="Define a number attribute used for the payload by 'name' (The name of the "
-                             "attribute, e.g.: temperature), 'type' (One of i [integer] or f [floating point])"
-                             "and 'number' (The value to be used). If 'max-number' is set, the number written will be"
-                             " randomly between 'number' and 'max-number' (each including). Note: Multiple "
+                        help="Define a number attribute used for the payload by 'name' (The name "
+                             "of the "
+                             "attribute, e.g.: temperature), 'type' (One of i [integer] or "
+                             "f [floating point])"
+                             "and 'number' (The value to be used). If 'max-number' is set, the "
+                             "number written will be"
+                             " randomly between 'number' and 'max-number' (each including). "
+                             "Note: Multiple "
                              "number attributes can be defined by repeating -an.")
 
     parser.add_argument('-as',
@@ -226,9 +245,11 @@ def parse_arguments():
                         dest='date_times',
                         action='append',
                         nargs=1,
-                        help="[Only NGSI!] Define a DateTime attribute used for the payload by 'name' "
+                        help="[Only NGSI!] Define a DateTime attribute used for the payload "
+                             "by 'name' "
                              "(The name of the attribute, "
-                             "e.g.: dateObserved). Note: The current time is used as value. Multiple DateTime "
+                             "e.g.: dateObserved). Note: The current time is used as value. "
+                             "Multiple DateTime "
                              "attributes can be defined by repeating -ad.")
 
     parser.add_argument('-al',
@@ -237,10 +258,14 @@ def parse_arguments():
                         dest='locations',
                         action='append',
                         nargs=1,
-                        help="[Only NGSI!] Define a location attribute used for the payload by 'name' (The name "
-                             "of the attribute, e.g.: position), 'lat' (The value for latitude) and 'long' "
-                             "(The value for longitude). If 'max-lat' and 'max-long' are set, the location "
-                             "written will be randomly between 'lat' and 'max-lat' and 'long' and 'max-long' "
+                        help="[Only NGSI!] Define a location attribute used for the payload "
+                             "by 'name' (The name "
+                             "of the attribute, e.g.: position), 'lat' (The value for latitude) "
+                             "and 'long' "
+                             "(The value for longitude). If 'max-lat' and 'max-long' are set, "
+                             "the location "
+                             "written will be randomly between 'lat' and 'max-lat' and 'long' "
+                             "and 'max-long' "
                              "resp. (each including). Note: Multiple location attributes "
                              "can be defined by repeating -al.")
 
@@ -250,17 +275,21 @@ def parse_arguments():
                         dest='booleans',
                         action='append',
                         nargs=2,
-                        help="[Only NGSI!] Define a boolean attribute used for the payload by 'name' "
+                        help="[Only NGSI!] Define a boolean attribute used for the payload "
+                             "by 'name' "
                              "(The name of the attribute, "
-                             "e.g.: public) and 'value' (One of 'true', 'false' or 'toggle' [ie. randomly switch "
-                             "between true and false]). Note: Multiple boolean attributes can be defined "
+                             "e.g.: public) and 'value' (One of 'true', 'false' or 'toggle' "
+                             "[ie. randomly switch "
+                             "between true and false]). Note: Multiple boolean attributes can "
+                             "be defined "
                              "by repeating -ab.")
 
     parser.add_argument('-ai',
                         '--attribute-indent',
                         metavar='indent',
                         dest='indent',
-                        help="Define the number of characters for indenting the created payload. [Default: 0]",
+                        help="Define the number of characters for indenting the created payload. "
+                             "[Default: 0]",
                         default=0,
                         type=int)
 
@@ -269,7 +298,8 @@ def parse_arguments():
                         dest='dry_run',
                         action='store_true',
                         default=False,
-                        help="Do a dry run only - giving the chance to review what WOULD be done incl. seeing what the "
+                        help="Do a dry run only - giving the chance to review what WOULD be done "
+                             "incl. seeing what the "
                              "payload will look like.")
 
     parser.add_argument('-v',
@@ -303,13 +333,15 @@ def check_arguments(parser, args):
             args.delete[0] = args.delete[1]
             args.delete[1] = t
         if args.unlimited:
-            parser.error("The switch '-u/--unlimited' cannot be used when deleting messages [-d/--delete]!")
+            parser.error("The switch '-u/--unlimited' cannot be used when deleting messages "
+                         "[-d/--delete]!")
     else:
         if args.datastream_id is not None and args.datastream_id < 0:
             parser.error("Please define a positive number for Datastream-Id [-a/--datastream-id]")
 
         if args.num_threads == 0:
-            parser.error("Without any thread, no messages will be sent at all! [-n/--num-threads > 0]")
+            parser.error("Without any thread, no messages will be sent at all! "
+                         "[-n/--num-threads > 0]")
 
         if args.num_messages <= 0:
             parser.error("Please consider increasing the number of messages! [-m/--messages > 0]")
@@ -328,7 +360,8 @@ def check_arguments(parser, args):
             for number in args.numbers:
                 attribute_args = number[0].split(',')
                 if len(attribute_args) < 3 or len(attribute_args) > 4:
-                    parser.error("-an argument ['-an %s'] expects 3 or 4 comma-delimited parameters!" %
+                    parser.error("-an argument ['-an %s'] expects 3 or 4 comma-delimited "
+                                 "parameters!" %
                                  ",".join(attribute_args))
                 if attribute_args[1] == "i":
                     t = 0
@@ -336,16 +369,19 @@ def check_arguments(parser, args):
                     try:
                         f = int(attribute_args[2])
                     except ValueError:
-                        parser.error("Please check attribute \"%s\": \"number\" must be an integer!" %
+                        parser.error("Please check attribute \"%s\": \"number\" must be an "
+                                     "integer!" %
                                      attribute_args[0])
                     if len(attribute_args) == 4:
                         try:
                             t = int(attribute_args[3])
                         except ValueError:
-                            parser.error("Please check attribute \"%s\": \"max-number\" must be an integer!" %
+                            parser.error("Please check attribute \"%s\": \"max-number\" must "
+                                         "be an integer!" %
                                          attribute_args[0])
                         if t < f:
-                            parser.error("Please check attribute \"%s\": \"max-number\" must be greater "
+                            parser.error("Please check attribute \"%s\": \"max-number\" must "
+                                         "be greater "
                                          "than or equal to \"number\"!" % attribute_args[0])
                 elif attribute_args[1] == "f":
                     t = 0.0
@@ -362,7 +398,8 @@ def check_arguments(parser, args):
                             parser.error("Please check attribute \"%s\": \"max-number\" must be a "
                                          "floating point number!" % attribute_args[0])
                         if t < f:
-                            parser.error("Please check attribute \"%s\": \"max-number\" must be greater "
+                            parser.error("Please check attribute \"%s\": \"max-number\" must be "
+                                         "greater "
                                          "than or equal to \"number\"!" % attribute_args[0])
                 else:
                     parser.error("Please check attribute \"%s\": type must be one of [i | f]!" %
@@ -372,7 +409,8 @@ def check_arguments(parser, args):
             for location in args.locations:
                 attribute_args = location[0].split(',')
                 if len(attribute_args) != 3 and len(attribute_args) != 5:
-                    parser.error("-al argument ['-al %s'] expects 3 or 5 comma-delimited parameters!" %
+                    parser.error("-al argument ['-al %s'] expects 3 or 5 comma-delimited "
+                                 "parameters!" %
                                  ",".join(attribute_args))
                 lat_from = 0.0
                 lat_to = 0.0
@@ -381,7 +419,8 @@ def check_arguments(parser, args):
                 try:
                     lat_from = float(attribute_args[1])
                 except ValueError:
-                    parser.error("Please check attribute \"%s\": \"lat\" must be a floating point number!" %
+                    parser.error("Please check attribute \"%s\": \"lat\" must be a floating "
+                                 "point number!" %
                                  attribute_args[0])
                 if lat_from < -90.0 or lat_from > 90.0:
                     parser.error("Please check attribute \"%s\": \"lat\" must be in a range from "
@@ -390,7 +429,8 @@ def check_arguments(parser, args):
                 try:
                     long_from = float(attribute_args[2])
                 except ValueError:
-                    parser.error("Please check attribute \"%s\": \"long\" must be a floating point number!" %
+                    parser.error("Please check attribute \"%s\": \"long\" must be a floating "
+                                 "point number!" %
                                  attribute_args[0])
                 if long_from < -180.0 or long_from > 180.0:
                     parser.error("Please check attribute \"%s\": \"long\" must be in a range from "
@@ -400,11 +440,13 @@ def check_arguments(parser, args):
                     try:
                         lat_to = float(attribute_args[3])
                     except ValueError:
-                        parser.error("Please check attribute \"%s\": \"max-lat\" must be a floating "
+                        parser.error("Please check attribute \"%s\": \"max-lat\" must be a "
+                                     "floating "
                                      "point number!" % attribute_args[0])
 
                     if lat_to < -90.0 or lat_to > 90.0:
-                        parser.error("Please check attribute \"%s\": \"max-lat\" must be in a range "
+                        parser.error("Please check attribute \"%s\": \"max-lat\" must be in a "
+                                     "range "
                                      "from -90.0 to 90.0!" % attribute_args[0])
 
                     try:
@@ -413,21 +455,25 @@ def check_arguments(parser, args):
                         parser.error("Please check attribute \"%s\": \"max-long\" must be a "
                                      "floating point number!" % attribute_args[0])
                     if long_to < -180.0 or long_to > 180.0:
-                        parser.error("Please check attribute \"%s\": \"max-long\" must be in a range "
+                        parser.error("Please check attribute \"%s\": \"max-long\" must be in a "
+                                     "range "
                                      "from -180.0 to 180.0!" % attribute_args[0])
 
                     if lat_to < lat_from:
-                        parser.error("Please check attribute \"%s\": \"max-lat\" must be greater than "
+                        parser.error("Please check attribute \"%s\": \"max-lat\" must be greater "
+                                     "than "
                                      "or equal to \"lat\"!" % attribute_args[0])
 
                     if long_to < long_from:
-                        parser.error("Please check attribute \"%s\": \"max-long\" must be greater than "
+                        parser.error("Please check attribute \"%s\": \"max-long\" must be greater "
+                                     "than "
                                      "or equal to \"long\"!" % attribute_args[0])
 
         if args.booleans is not None:
             for boolean in args.booleans:
                 if boolean[1] != "true" and boolean[1] != "false" and boolean[1] != "toggle":
-                    parser.error("Please check attribute \"%s\": \"value\" must be one of \"true\", "
+                    parser.error("Please check attribute \"%s\": \"value\" must be one "
+                                 "of \"true\", "
                                  "\"false\" or \"toggle\"!" % boolean[0])
 
         if not args.delete:

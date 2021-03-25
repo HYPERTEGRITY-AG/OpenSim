@@ -88,7 +88,8 @@ def create_data_stream_payload(data_stream_name, indent):
 
     payload["name"] = data_stream_name
     payload["description"] = "This Datastream was created by opensim.py"
-    payload["observationType"] = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"
+    payload["observationType"] = \
+        "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"
 
     unit_of_measurement = dict()
     unit_of_measurement["name"] = "number"
@@ -196,7 +197,8 @@ def create_payload_ngsi(first_id,
             if len(attribute_args) > 3:
                 lat_to = float(attribute_args[3])
                 long_to = float(attribute_args[4])
-                coord["coordinates"] = [random.uniform(lat_from, lat_to), random.uniform(long_from, long_to)]
+                coord["coordinates"] = [random.uniform(lat_from, lat_to), random.uniform(long_from,
+                                                                                         long_to)]
 
             attr["value"] = coord
             payload[attribute_args[0]] = attr

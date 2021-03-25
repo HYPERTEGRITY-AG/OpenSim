@@ -3,15 +3,14 @@
 import datetime
 import signal
 import sys
-import requests
 from datetime import datetime
-from time import sleep
-
 from threading import Lock
 from threading import Thread
+from time import sleep
+
+import requests
 
 from modules import arguments, sensor_things, helper, ngsi, output
-
 
 # some globals
 start = datetime.now()
