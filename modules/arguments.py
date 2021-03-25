@@ -3,7 +3,6 @@
 import argparse
 import shutil
 import textwrap as _textwrap
-import os
 
 from modules import helper
 
