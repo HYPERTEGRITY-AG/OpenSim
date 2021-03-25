@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import socket
-import paho.mqtt.client as mqtt  # type: ignore
-import sys
 import json
-import requests
+import socket
+import sys
 from time import sleep
+
+import paho.mqtt.client as mqtt  # type: ignore
+import requests
 
 from modules import helper
 

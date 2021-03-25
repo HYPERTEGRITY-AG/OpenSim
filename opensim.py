@@ -3,14 +3,13 @@
 import signal
 import sys
 from datetime import datetime
-from threading import Lock
-from threading import Thread
+from threading import Lock, Thread
 from time import sleep
 from typing import Dict
 
 import requests
 
-from modules import arguments, sensor_things, helper, ngsi, output
+from modules import arguments, helper, ngsi, output, sensor_things
 
 # some globals
 start = datetime.now()
