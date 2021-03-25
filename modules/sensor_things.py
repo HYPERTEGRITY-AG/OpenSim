@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import socket
-import paho.mqtt.client as mqtt
+import paho.mqtt.client as mqtt # type: ignore
 import sys
 import json
 import requests

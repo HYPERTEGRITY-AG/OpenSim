@@ -6,6 +6,7 @@ from datetime import datetime
 from threading import Lock
 from threading import Thread
 from time import sleep
+from typing import Dict
 
 import requests
 
@@ -14,7 +15,7 @@ from modules import arguments, sensor_things, helper, ngsi, output
 # some globals
 start = datetime.now()
 errors = 0
-unique_errors = dict()
+unique_errors = dict()  # type: Dict[str, int]
 overall_messages = 0
 overall_time = 0
 deleted = 0
