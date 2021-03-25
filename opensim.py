@@ -35,7 +35,7 @@ def do_delete(session, lock, args, max_id_length):
     if args.x_api_key is not None:
         headers[helper.X_GRAVITEE_API_KEY] = args.x_api_key
     elif args.bearer is not None:
-        headers[helper.AUTHORIZATION] = 'Bearer ' + args.bearer
+        headers[helper.AUTHORIZATION] = "Bearer " + args.bearer
 
     if args.tenant is not None:
         headers[helper.FIWARE_SERVICE] = args.tenant
@@ -58,13 +58,17 @@ def do_delete(session, lock, args, max_id_length):
                     errors += 1
         else:
             thing_name = helper.create_id(i, args.prefix, args.postfix, 0)
-            thing_id, ms = sensor_things.get_thing_id(session, host, thing_name, args.x_api_key)
+            thing_id, ms = sensor_things.get_thing_id(
+                session, host, thing_name, args.x_api_key
+            )
             if thing_id == sensor_things.INVALID_ID:
                 not_deleted += 1
                 resp = requests.Response()
                 resp.status_code = 404
             else:
-                resp = sensor_things.delete_thing(session, host, thing_id, args.x_api_key)
+                resp = sensor_things.delete_thing(
+                    session, host, thing_id, args.x_api_key
+                )
                 if resp.status_code == 200:
                     deleted += 1
                 else:
@@ -80,7 +84,9 @@ def do_delete(session, lock, args, max_id_length):
                 else:
                     unique_errors[error_as_string] = 1
             else:
-                error_as_string = str(resp.status_code) + " " + " ".join(resp.text.split())[0:120]
+                error_as_string = (
+                    str(resp.status_code) + " " + " ".join(resp.text.split())[0:120]
+                )
 
                 if error_as_string in unique_errors.keys():
                     num = unique_errors[error_as_string]
@@ -92,18 +98,30 @@ def do_delete(session, lock, args, max_id_length):
 
             if args.verbose:
                 if connection_error:
-                    print('%s%s  ??? %s' % (delimiter, helper.create_id(i,
-                                                                        args.prefix,
-                                                                        args.postfix,
-                                                                        max_id_length),
-                                            error_as_string), end="")
+                    print(
+                        "%s%s  ??? %s"
+                        % (
+                            delimiter,
+                            helper.create_id(
+                                i, args.prefix, args.postfix, max_id_length
+                            ),
+                            error_as_string,
+                        ),
+                        end="",
+                    )
                 else:
-                    print('%s%s  %3i %s' % (delimiter, helper.create_id(i,
-                                                                        args.prefix,
-                                                                        args.postfix,
-                                                                        max_id_length),
-                                            resp.status_code,
-                                            " ".join(resp.text.split())[0:120]), end="")
+                    print(
+                        "%s%s  %3i %s"
+                        % (
+                            delimiter,
+                            helper.create_id(
+                                i, args.prefix, args.postfix, max_id_length
+                            ),
+                            resp.status_code,
+                            " ".join(resp.text.split())[0:120],
+                        ),
+                        end="",
+                    )
                 delimiter = "\n"
 
 
@@ -141,15 +159,12 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
             if args.x_api_key is not None:
                 headers[helper.X_GRAVITEE_API_KEY] = args.x_api_key
             elif args.bearer is not None:
-                headers[helper.AUTHORIZATION] = 'Bearer ' + args.bearer
+                headers[helper.AUTHORIZATION] = "Bearer " + args.bearer
 
             if args.insert_always:
-                resp, payload = ngsi.do_post(session,
-                                             host,
-                                             first_id,
-                                             headers,
-                                             True,
-                                             args)
+                resp, payload = ngsi.do_post(
+                    session, host, first_id, headers, True, args
+                )
                 if resp is None:
                     ms = 0
                     okay = False
@@ -157,11 +172,7 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     ms = int(resp.elapsed.total_seconds() * 1000)
                     okay = resp.status_code == 204
             else:
-                resp, payload = ngsi.do_patch(session,
-                                              host,
-                                              first_id,
-                                              headers,
-                                              args)
+                resp, payload = ngsi.do_patch(session, host, first_id, headers, args)
                 if resp is None:
                     ms = 0
                     okay = False
@@ -170,12 +181,9 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     if resp.status_code >= 400:
                         okay = False
                     elif resp.status_code != 204:
-                        resp, payload = ngsi.do_post(session,
-                                                     host,
-                                                     first_id,
-                                                     headers,
-                                                     False,
-                                                     args)
+                        resp, payload = ngsi.do_post(
+                            session, host, first_id, headers, False, args
+                        )
                         if resp is None:
                             ms = 0
                             okay = False
@@ -191,9 +199,11 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     if resp is None:
                         error_as_string = "Connection Error"
                     else:
-                        error_as_string = str(resp.status_code) + \
-                                          " " + \
-                                          " ".join(resp.text.split())[0:120]
+                        error_as_string = (
+                            str(resp.status_code)
+                            + " "
+                            + " ".join(resp.text.split())[0:120]
+                        )
 
                     if error_as_string in unique_errors.keys():
                         num = unique_errors[error_as_string]
@@ -206,14 +216,18 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
 
                 if args.verbose:
                     if resp is None:
-                        print('%s  ???  ---- Connection Error!' %
-                              helper.create_id(first_id, args.prefix, args.postfix, max_id_length))
+                        print(
+                            "%s  ???  ---- Connection Error!"
+                            % helper.create_id(
+                                first_id, args.prefix, args.postfix, max_id_length
+                            )
+                        )
                     else:
                         message = " ".join(resp.text.split())[0:120]
                         # There is this funny thing that Orion sometimes tells
                         # us about 400 ParseError
                         if resp.status_code == 400:
-                            message += ("\nPayload was:\n" + payload)
+                            message += "\nPayload was:\n" + payload
 
                             # try to resend
                             # if insert_always:
@@ -223,13 +237,17 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
 
                             # In 100%, resending exactly the same payload again gives a 201
 
-                        print('%s  %3i  %4i %s' % (helper.create_id(first_id,
-                                                                    args.prefix,
-                                                                    args.postfix,
-                                                                    max_id_length),
-                                                   resp.status_code,
-                                                   ms,
-                                                   message))
+                        print(
+                            "%s  %3i  %4i %s"
+                            % (
+                                helper.create_id(
+                                    first_id, args.prefix, args.postfix, max_id_length
+                                ),
+                                resp.status_code,
+                                ms,
+                                message,
+                            )
+                        )
         else:
             #  Here we go with SensorThings-HTTP/SensorThings-MQTT
             resp = None
@@ -248,22 +266,25 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                         okay = True
 
                         if thing_id == sensor_things.INVALID_ID:
-                            thing_name = helper.create_id(first_id, args.prefix, args.postfix, 0)
+                            thing_name = helper.create_id(
+                                first_id, args.prefix, args.postfix, 0
+                            )
 
                             #  check, if the thing with the given name (thing_name) already exists:
-                            thing_id, resp = sensor_things.get_thing_id(session,
-                                                                        host,
-                                                                        thing_name,
-                                                                        args.x_api_key)
+                            thing_id, resp = sensor_things.get_thing_id(
+                                session, host, thing_name, args.x_api_key
+                            )
                             if resp is None:
                                 okay = False
                             elif resp.status_code == 404:
                                 ms = int(resp.elapsed.total_seconds() * 1000)
-                                thing_id, resp = sensor_things.create_thing(session,
-                                                                            host,
-                                                                            thing_name,
-                                                                            args.indent,
-                                                                            args.x_api_key)
+                                thing_id, resp = sensor_things.create_thing(
+                                    session,
+                                    host,
+                                    thing_name,
+                                    args.indent,
+                                    args.x_api_key,
+                                )
                                 if resp.status_code != 201:
                                     okay = False
                             elif resp.status_code == 200:
@@ -273,37 +294,48 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                                 # neither 200 nor 404 - error!
                                 okay = False
 
-            if okay and thing_id != sensor_things.INVALID_ID and thing_id != sensor_things.ERROR:
+            if (
+                okay
+                and thing_id != sensor_things.INVALID_ID
+                and thing_id != sensor_things.ERROR
+            ):
                 if args.numbers is not None:
                     for number in args.numbers:
-                        attribute_args = number[0].split(',')
+                        attribute_args = number[0].split(",")
 
                         # shortcut: if at this point data_stream_id != INVALID_ID, then we
                         #           only have ONE attribute at all! So, no need to find out
                         #           data_stream_id...create an Observation immediately instead
-                        if args.datastream_id is None and \
-                                data_stream_id == sensor_things.INVALID_ID:
+                        if (
+                            args.datastream_id is None
+                            and data_stream_id == sensor_things.INVALID_ID
+                        ):
                             with lock:  # since we might be running in more than one thread!
                                 data_stream_name = attribute_args[0]
-                                data_stream_id, ms2 = \
-                                    sensor_things.get_data_stream_id(session,
-                                                                     host,
-                                                                     thing_id,
-                                                                     data_stream_name,
-                                                                     args.x_api_key)
+                                data_stream_id, ms2 = sensor_things.get_data_stream_id(
+                                    session,
+                                    host,
+                                    thing_id,
+                                    data_stream_name,
+                                    args.x_api_key,
+                                )
 
                                 ms = int((ms + ms2) / 2)
 
                                 if data_stream_id == sensor_things.ERROR:
                                     okay = False
                                 elif data_stream_id == sensor_things.INVALID_ID:
-                                    data_stream_id, ms2 = \
-                                        sensor_things.create_data_stream(session,
-                                                                         host,
-                                                                         thing_id,
-                                                                         data_stream_name,
-                                                                         args.indent,
-                                                                         args.x_api_key)
+                                    (
+                                        data_stream_id,
+                                        ms2,
+                                    ) = sensor_things.create_data_stream(
+                                        session,
+                                        host,
+                                        thing_id,
+                                        data_stream_name,
+                                        args.indent,
+                                        args.x_api_key,
+                                    )
                                     ms = int((ms + ms2) / 2)
                                     if data_stream_id == sensor_things.ERROR:
                                         okay = False
@@ -312,15 +344,16 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                         # Create an observation
                         value = helper.create_value_from_attribute_args(attribute_args)
 
-                        resp = sensor_things.create_observation(mqtt_client,
-                                                                session,
-                                                                host,
-                                                                args.protocol ==
-                                                                helper.PROTOCOL_SENSOR_THINGS_MQTT,
-                                                                data_stream_id,
-                                                                value,
-                                                                args.indent,
-                                                                args.x_api_key)
+                        resp = sensor_things.create_observation(
+                            mqtt_client,
+                            session,
+                            host,
+                            args.protocol == helper.PROTOCOL_SENSOR_THINGS_MQTT,
+                            data_stream_id,
+                            value,
+                            args.indent,
+                            args.x_api_key,
+                        )
 
                         if resp is not None:
                             ms2 = int(resp.elapsed.total_seconds() * 1000)
@@ -333,39 +366,43 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     for string in args.strings:
                         data_stream_name = string[0]
                         with lock:  # since we might be running in more than one thread, use lock!
-                            data_stream_id, ms2 = sensor_things.get_data_stream_id(session,
-                                                                                   host,
-                                                                                   thing_id,
-                                                                                   data_stream_name,
-                                                                                   args.x_api_key)
+                            data_stream_id, ms2 = sensor_things.get_data_stream_id(
+                                session,
+                                host,
+                                thing_id,
+                                data_stream_name,
+                                args.x_api_key,
+                            )
 
                             ms = int((ms + ms2) / 2)
 
                             if data_stream_id == sensor_things.ERROR:
                                 okay = False
                             elif data_stream_id == sensor_things.INVALID_ID:
-                                data_stream_id, ms2 = \
-                                    sensor_things.create_data_stream(session,
-                                                                     host,
-                                                                     thing_id,
-                                                                     data_stream_name,
-                                                                     args.indent,
-                                                                     args.x_api_key)
+                                data_stream_id, ms2 = sensor_things.create_data_stream(
+                                    session,
+                                    host,
+                                    thing_id,
+                                    data_stream_name,
+                                    args.indent,
+                                    args.x_api_key,
+                                )
                                 ms = int((ms + ms2) / 2)
                                 if data_stream_id == sensor_things.ERROR:
                                     okay = False
                                     data_stream_id = sensor_things.INVALID_ID
 
                         # Create an observation
-                        resp = sensor_things.create_observation(mqtt_client,
-                                                                session,
-                                                                host,
-                                                                args.protocol ==
-                                                                helper.PROTOCOL_SENSOR_THINGS_MQTT,
-                                                                data_stream_id,
-                                                                string[1],
-                                                                args.indent,
-                                                                args.x_api_key)
+                        resp = sensor_things.create_observation(
+                            mqtt_client,
+                            session,
+                            host,
+                            args.protocol == helper.PROTOCOL_SENSOR_THINGS_MQTT,
+                            data_stream_id,
+                            string[1],
+                            args.indent,
+                            args.x_api_key,
+                        )
 
                         if resp is not None:
                             ms2 = int(resp.elapsed.total_seconds() * 1000)
@@ -382,9 +419,11 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     if resp is None:
                         error_as_string = "Connection Error"
                     else:
-                        error_as_string = str(resp.status_code) + \
-                                          " " + \
-                                          " ".join(resp.text.split())[0:120]
+                        error_as_string = (
+                            str(resp.status_code)
+                            + " "
+                            + " ".join(resp.text.split())[0:120]
+                        )
 
                     if error_as_string in unique_errors.keys():
                         num = unique_errors[error_as_string]
@@ -396,17 +435,25 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
 
                 if args.verbose:
                     if resp is None:
-                        print('%s  ???  ---- Connection Error!' %
-                              helper.create_id(first_id, args.prefix, args.postfix, max_id_length))
+                        print(
+                            "%s  ???  ---- Connection Error!"
+                            % helper.create_id(
+                                first_id, args.prefix, args.postfix, max_id_length
+                            )
+                        )
                     else:
                         message = " ".join(resp.text.split())[0:120]
-                        print('%s  %3i  %4i %s' % (helper.create_id(first_id,
-                                                                    args.prefix,
-                                                                    args.postfix,
-                                                                    max_id_length),
-                                                   resp.status_code,
-                                                   ms,
-                                                   message))
+                        print(
+                            "%s  %3i  %4i %s"
+                            % (
+                                helper.create_id(
+                                    first_id, args.prefix, args.postfix, max_id_length
+                                ),
+                                resp.status_code,
+                                ms,
+                                message,
+                            )
+                        )
 
         if not args.static_id:
             thing_id = sensor_things.INVALID_ID
@@ -423,14 +470,14 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
 
 def signal_handler(*_):
     stop_send_threads()
-    print('\nInterrupted!')
+    print("\nInterrupted!")
     output.show_result(False, start, errors, unique_errors)
     sys.exit(0)
 
 
 def signal_handler_delete(*_):
     stop_delete_thread()
-    print('\nInterrupted!')
+    print("\nInterrupted!")
     output.show_result(True, start, errors, unique_errors)
     sys.exit(0)
 
@@ -441,20 +488,25 @@ def wait_for_delete_thread(args):
         sleep(0.5)
         if overall_messages > 0 and not args.verbose:
             if args.unlimited:
-                print("\rMessages sent: %i with %i not found and %i other error(s)      " % (
-                      overall_messages,
-                      not_deleted,
-                      errors),
-                      end="",
-                      flush=True)
+                print(
+                    "\rMessages sent: %i with %i not found and %i other error(s)      "
+                    % (overall_messages, not_deleted, errors),
+                    end="",
+                    flush=True,
+                )
             else:
-                print("\rMessages sent: %i (%i%%) with %i not found and %i other error(s)      " % (
-                      overall_messages,
-                      (overall_messages / (args.delete[1] - args.delete[0] + 1)) * 100,
-                      not_deleted,
-                      errors),
-                      end="",
-                      flush=True)
+                print(
+                    "\rMessages sent: %i (%i%%) with %i not found and %i other error(s)      "
+                    % (
+                        overall_messages,
+                        (overall_messages / (args.delete[1] - args.delete[0] + 1))
+                        * 100,
+                        not_deleted,
+                        errors,
+                    ),
+                    end="",
+                    flush=True,
+                )
 
         ready = True
         if delete_thread.is_alive():
@@ -465,10 +517,7 @@ def wait_for_delete_thread(args):
 def create_and_start_delete_thread(session, lock, args, max_id_length):
     global delete_thread
 
-    delete_thread = Thread(target=do_delete, args=(session,
-                                                   lock,
-                                                   args,
-                                                   max_id_length))
+    delete_thread = Thread(target=do_delete, args=(session, lock, args, max_id_length))
 
     delete_thread.daemon = True
     delete_thread.start()
@@ -516,14 +565,12 @@ def create_send_threads(args, mqtt_client, session, lock, max_id_length):
     offset = 0
 
     for i in range(args.num_threads):
-        t = Thread(target=do_send, args=(mqtt_client,
-                                         session,
-                                         lock,
-                                         args,
-                                         offset,
-                                         max_id_length))
+        t = Thread(
+            target=do_send,
+            args=(mqtt_client, session, lock, args, offset, max_id_length),
+        )
         send_threads.append(t)
-        print('.', end='', flush=True)
+        print(".", end="", flush=True)
 
         if not args.static_id:
             offset += args.num_messages
@@ -552,8 +599,9 @@ def wait_for_send_threads(limit_time, verbose, msg_num, unlimited):
             continue
 
         if not verbose:
-            output.print_messages_send(overall_messages,
-                                       errors, overall_time, temp_ms, msg_num, unlimited)
+            output.print_messages_send(
+                overall_messages, errors, overall_time, temp_ms, msg_num, unlimited
+            )
 
         ready = True
         for t in send_threads:
@@ -604,9 +652,11 @@ def handle_send(args, session, lock, msg_num, max_id_length):
         print("Dry run only. Exiting...", flush=True)
         sys.exit(0)
 
-    mqtt_client = sensor_things.init_mqtt(helper.create_host_url(args.server)) \
-        if args.protocol == helper.PROTOCOL_SENSOR_THINGS_MQTT \
+    mqtt_client = (
+        sensor_things.init_mqtt(helper.create_host_url(args.server))
+        if args.protocol == helper.PROTOCOL_SENSOR_THINGS_MQTT
         else None
+    )
 
     create_send_threads(args, mqtt_client, session, lock, max_id_length)
 
@@ -629,12 +679,9 @@ def handle_send(args, session, lock, msg_num, max_id_length):
         mqtt_client.loop_stop()
 
     if args.verbose:
-        output.print_messages_send(overall_messages,
-                                   errors,
-                                   overall_time,
-                                   ms,
-                                   msg_num,
-                                   args.unlimited)
+        output.print_messages_send(
+            overall_messages, errors, overall_time, ms, msg_num, args.unlimited
+        )
         print("")
 
 

@@ -29,7 +29,7 @@ def init_mqtt(host):
     mqtt_client = mqtt.Client()
 
     try:
-        mqtt_client.connect(host.split('/')[2].split(':')[0], 1883, 60)
+        mqtt_client.connect(host.split("/")[2].split(":")[0], 1883, 60)
         print("Waiting for MQTT-Broker to be connected...", end="", flush=True)
         mqtt_client.loop_start()
 
@@ -45,10 +45,7 @@ def init_mqtt(host):
     return mqtt_client
 
 
-def delete_thing(session,
-                 host,
-                 thing_id,
-                 x_api_key):
+def delete_thing(session, host, thing_id, x_api_key):
     url = "%s/v1.1/Things(%i)" % (host, thing_id)
 
     headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
@@ -59,11 +56,7 @@ def delete_thing(session,
     return session.delete(url, headers=headers)
 
 
-def create_thing(session,
-                 host,
-                 thing_name,
-                 indent,
-                 x_api_key):
+def create_thing(session, host, thing_name, indent, x_api_key):
     try:
         url = "%s/v1.1/Things" % host
 
@@ -87,12 +80,7 @@ def create_thing(session,
     return INVALID_ID, resp
 
 
-def create_data_stream(session,
-                       host,
-                       thing_id,
-                       data_stream_name,
-                       indent,
-                       x_api_key):
+def create_data_stream(session, host, thing_id, data_stream_name, indent, x_api_key):
     try:
         url = "%s/v1.1/Things(%i)/Datastreams" % (host, thing_id)
 
@@ -107,7 +95,9 @@ def create_data_stream(session,
         ms = int(resp.elapsed.total_seconds() * 1000)
 
         if resp.status_code == 201:
-            thing_id, ms2 = get_data_stream_id(session, host, thing_id, data_stream_name, x_api_key)
+            thing_id, ms2 = get_data_stream_id(
+                session, host, thing_id, data_stream_name, x_api_key
+            )
 
             ms = int((ms + ms2) / 2)
             return thing_id, ms
@@ -118,14 +108,9 @@ def create_data_stream(session,
     return INVALID_ID, ms
 
 
-def create_observation(mqtt_client,
-                       session,
-                       host,
-                       use_mqtt,
-                       data_stream_id,
-                       value,
-                       indent,
-                       x_api_key):
+def create_observation(
+    mqtt_client, session, host, use_mqtt, data_stream_id, value, indent, x_api_key
+):
     payload = helper.create_observation_payload(value, indent)
 
     if use_mqtt:
@@ -152,7 +137,7 @@ def create_observation(mqtt_client,
 
 def get_thing_id(session, host, thing_name, x_api_key):
     try:
-        url = "%s/v1.1/Things?$select=name,id&$filter=name eq \'%s\'" % (host, thing_name)
+        url = "%s/v1.1/Things?$select=name,id&$filter=name eq '%s'" % (host, thing_name)
 
         headers = {}
 
@@ -180,8 +165,11 @@ def get_thing_id(session, host, thing_name, x_api_key):
 
 def get_data_stream_id(session, host, thing_id, data_stream_name, x_api_key):
     try:
-        url = "%s/v1.1/Things(%i)/Datastreams?$select=name,id&$filter=name eq \'%s\'" % \
-              (host, thing_id, data_stream_name)
+        url = "%s/v1.1/Things(%i)/Datastreams?$select=name,id&$filter=name eq '%s'" % (
+            host,
+            thing_id,
+            data_stream_name,
+        )
 
         headers = {}
 

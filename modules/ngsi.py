@@ -26,9 +26,7 @@ def do_post(session, host, first_id, headers, upsert, args):
     if upsert:
         url += OPTIONS_UPSERT
 
-    payload = helper.create_payload_ngsi(first_id,
-                                         True,
-                                         args)
+    payload = helper.create_payload_ngsi(first_id, True, args)
     try:
         resp = session.post(url, data=payload, headers=headers)
     except (requests.exceptions.RequestException, Exception):
@@ -38,14 +36,17 @@ def do_post(session, host, first_id, headers, upsert, args):
 
 
 def do_patch(session, host, first_id, headers, args):
-    url = host + V2_ENTITIES + helper.create_id(first_id, args.prefix, args.postfix, 0) + ATTRS
+    url = (
+        host
+        + V2_ENTITIES
+        + helper.create_id(first_id, args.prefix, args.postfix, 0)
+        + ATTRS
+    )
     if args.type is not None:
         url += TYPE_IS
         url += args.type
 
-    payload = helper.create_payload_ngsi(None,
-                                         False,
-                                         args)
+    payload = helper.create_payload_ngsi(None, False, args)
     try:
         resp = session.patch(url, data=payload, headers=headers)
     except (requests.exceptions.RequestException, Exception):

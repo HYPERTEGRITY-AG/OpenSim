@@ -5,15 +5,15 @@ import random
 from datetime import datetime
 
 # some "consts"
-VERSION = '1.0.0'
-FIWARE_SERVICE = 'fiware-service'
-X_GRAVITEE_API_KEY = 'X-Gravitee-Api-Key'
-AUTHORIZATION = 'Authorization'
-CONTENT_TYPE = 'content-type'
-APPLICATION_JSON = 'application/json'
-PROTOCOL_NGSI = 'NGSI'
-PROTOCOL_SENSOR_THINGS_HTTP = 'SensorThings-HTTP'
-PROTOCOL_SENSOR_THINGS_MQTT = 'SensorThings-MQTT'
+VERSION = "1.0.0"
+FIWARE_SERVICE = "fiware-service"
+X_GRAVITEE_API_KEY = "X-Gravitee-Api-Key"
+AUTHORIZATION = "Authorization"
+CONTENT_TYPE = "content-type"
+APPLICATION_JSON = "application/json"
+PROTOCOL_NGSI = "NGSI"
+PROTOCOL_SENSOR_THINGS_HTTP = "SensorThings-HTTP"
+PROTOCOL_SENSOR_THINGS_MQTT = "SensorThings-MQTT"
 
 
 def create_id(first_id, prefix, postfix, align):
@@ -28,7 +28,7 @@ def create_id(first_id, prefix, postfix, align):
     if align == 0:
         return ret
 
-    return ret.rjust(align, ' ')
+    return ret.rjust(align, " ")
 
 
 def create_host_url(host):
@@ -88,8 +88,9 @@ def create_data_stream_payload(data_stream_name, indent):
 
     payload["name"] = data_stream_name
     payload["description"] = "This Datastream was created by opensim.py"
-    payload["observationType"] = \
-        "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"
+    payload[
+        "observationType"
+    ] = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"
 
     unit_of_measurement = dict()
     unit_of_measurement["name"] = "number"
@@ -134,9 +135,7 @@ def create_observation_payload(value, indent):
         return json.dumps(payload)
 
 
-def create_payload_ngsi(first_id,
-                        meta_data,
-                        args):
+def create_payload_ngsi(first_id, meta_data, args):
     payload = dict()
     if meta_data:
         if first_id is not None:
@@ -146,12 +145,15 @@ def create_payload_ngsi(first_id,
 
     if args.date_times is not None:
         for date_time in args.date_times:
-            attr = {"type": "DateTime", "value": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.00Z")}
+            attr = {
+                "type": "DateTime",
+                "value": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.00Z"),
+            }
             payload[date_time[0]] = attr
 
     if args.numbers is not None:
         for number in args.numbers:
-            attribute_args = number[0].split(',')
+            attribute_args = number[0].split(",")
 
             attr = {}
 
@@ -184,7 +186,7 @@ def create_payload_ngsi(first_id,
 
     if args.locations is not None:
         for location in args.locations:
-            attribute_args = location[0].split(',')
+            attribute_args = location[0].split(",")
 
             attr = {"type": "geo:json"}
 
@@ -197,8 +199,10 @@ def create_payload_ngsi(first_id,
             if len(attribute_args) > 3:
                 lat_to = float(attribute_args[3])
                 long_to = float(attribute_args[4])
-                coord["coordinates"] = [random.uniform(lat_from, lat_to), random.uniform(long_from,
-                                                                                         long_to)]
+                coord["coordinates"] = [
+                    random.uniform(lat_from, lat_to),
+                    random.uniform(long_from, long_to),
+                ]
 
             attr["value"] = coord
             payload[attribute_args[0]] = attr
