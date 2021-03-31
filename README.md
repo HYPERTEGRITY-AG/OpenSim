@@ -369,4 +369,8 @@ if %i% leq %limit% (
    goto :while
 )
 ```
-It's up to your fantasy to create a script that increases the temperature slightly over the day and cools down by night or even have higher air polution from Monday to Friday and a clean weekend. 
+It's up to your fantasy to create a script that increases the temperature slightly over the day and cools down by night or even have higher air polution from Monday to Friday and a clean weekend.
+
+In the HowTos-folder you'll find some interesting use cases on:
+* [Using min.io-server to store images and send the URI.](./HowTos/Use%20min.io-Server.md)
+* [Parsing a gpx-file and send the positions in a timed manner.](./HowTos/Send%20Route%20(gpx).md)
