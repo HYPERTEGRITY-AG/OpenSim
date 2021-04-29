@@ -10,7 +10,7 @@ For this to end, not the complete APIs of both, Orion and FROST are implemented 
 
 A simple call of this tool like...
 ```commandline
-$ ./opensim.py -s http://myserver.com -p NGSI -ad dateObserved -an temperature,f,20.5
+$ ./opensim.py -s http://myserver.com -p NGSI-V2 -ad dateObserved -an temperature,f,20.5
 ```
 ...will send one context to an Orion Context Broker at myserver.com with a payload defining a weather observation (date and temperature).  
 And if you don't want to read this documentation at all: Remember that you can use --help at any time! :-)
@@ -18,7 +18,7 @@ And if you don't want to read this documentation at all: Remember that you can u
 $ ./opensim.py -h
 opensim.py, Copyright (c) 2021 Will Freitag, Version 1.0.0
 usage: opensim.py [-h] -s
-                  [protocol]host-name [-p {NGSI,SensorThings-MQTT,SensorThings-HTTP}]
+                  [protocol]host-name [-p {NGSI-V2,SensorThings-MQTT,SensorThings-HTTP}]
                   [-i] [-a id] [-x API-Key | -b token] [-f id] [-e PREFIX]
                   [-o POSTFIX] [-c] [-n num] [-m num] [-u] [-q milliseconds]
                   [-l seconds] [-t name] [-y name]
@@ -35,9 +35,9 @@ optional arguments:
                         protocol is omitted and appended with
                         "/v2/entities/[?options=upsert]" or "/v1.1/..." resp.
                         depending on the server-type (-p/--protocol).
-  -p {NGSI,SensorThings-MQTT,SensorThings-HTTP}, --protocol {NGSI,SensorThings-MQTT,SensorThings-HTTP}
-                        Define the type of server. [Default: NGSI]
-  -i, --insert-always   [Only NGSI!] If set, the contexts will always be
+  -p {NGSI-V2,SensorThings-MQTT,SensorThings-HTTP}, --protocol {NGSI-V2,SensorThings-MQTT,SensorThings-HTTP}
+                        Define the type of server. [Default: NGSI-V2]
+  -i, --insert-always   [Only NGSI-V2!] If set, the contexts will always be
                         inserted (via POST with option 'upsert') instead of
                         trying to update first (via PATCH) and insert (via POST
                         w/o option 'upsert'), if not existing (i.e. PATCH
@@ -79,9 +79,9 @@ optional arguments:
                         Only in conjunction with '-u/--unlimited': Stops after
                         the given time in seconds.
   -t name, --tenant name
-                        [Only NGSI!] This tenant-name will be used as service-
+                        [Only NGSI-V2!] This tenant-name will be used as service-
                         name in Orion Context Broker.
-  -y name, --type name  [Only NGSI!] If set, this type-name will be used in the
+  -y name, --type name  [Only NGSI-V2!] If set, this type-name will be used in the
                         payload.
   -an name,type,number[,max-number], --attribute-number name,type,number[,max-number]
                         Define a number attribute used for the payload by 'name'
@@ -97,13 +97,13 @@ optional arguments:
                         'value' (the actual string). Note: Multiple string
                         attributes can be defined by repeating -as.
   -ad name, --attribute-date name
-                        [Only NGSI!] Define a DateTime attribute used for the
+                        [Only NGSI-V2!] Define a DateTime attribute used for the
                         payload by 'name' (The name of the attribute, e.g.:
                         dateObserved). Note: The current time is used as value.
                         Multiple DateTime attributes can be defined by repeating
                         -ad.
   -al name,lat,long[,max-lat,max-long], --attribute-location name,lat,long[,max-lat,max-long]
-                        [Only NGSI!] Define a location attribute used for the
+                        [Only NGSI-V2!] Define a location attribute used for the
                         payload by 'name' (The name of the attribute, e.g.:
                         position), 'lat' (The value for latitude) and 'long'
                         (The value for longitude). If 'max-lat' and 'max-long'
@@ -112,7 +112,7 @@ optional arguments:
                         (each including). Note: Multiple location attributes can
                         be defined by repeating -al.
   -ab name value, --attribute-boolean name value
-                        [Only NGSI!] Define a boolean attribute used for the
+                        [Only NGSI-V2!] Define a boolean attribute used for the
                         payload by 'name' (The name of the attribute, e.g.:
                         public) and 'value' (One of 'true', 'false' or 'toggle'
                         [ie. randomly switch between true and false]). Note:
@@ -189,18 +189,18 @@ Install with: `$ pip install paho-mqtt`
 By running: `pip[3] install -r requirements.txt [--user]` the required libraries can be installed at once.
 
 ## What's that "ID"?
-In Orion Context Broker (NGSI), Contexts are stored as entities, and these entities are referred by their **"id"** (e.g. "urn:ngsi-v2:AirQualityObserved:RZ:Obsv4567"). Such an entity will then have some meta-data and one or more attributes. \
+In Orion Context Broker (NGSI-XX), Contexts are stored as entities, and these entities are referred by their **"id"** (e.g. "urn:ngsi-v2:AirQualityObserved:RZ:Obsv4567"). Such an entity will then have some meta-data and one or more attributes. \
 In FROST (SensorThings), It all starts with a "Thing" that has a **"name"** and an internal (numeric) id. Dependencies (Datastreams, Observations) are related to that internal id that is generated by FROST. \
 opensim.py uses a numeric "id" (starting with simply '1') that can easily be looped. 
 This id is then used as the entity's "id" (Orion) and "name" (FROST) respectively.    
 Please note: This numeric id can be prepended/appended with strings, letting it look more like a "real" entity/thing, if wanted.
 
 ## What is a "Message"?
-A "message" is the attempt, to store a single attribute (SensorThings) or one or more attributes at once (NGSI). For this attempt, one or more calls to the server's API are needed, depending on the type of server (NGSI or ServerThings), the scheme that is used (NGSI), a looping or static id (SensorThings) and even the number of messages and attributes (SensorThings).  
+A "message" is the attempt, to store a single attribute (SensorThings) or one or more attributes at once (NGSI-XX). For this attempt, one or more calls to the server's API are needed, depending on the type of server (NGSI or ServerThings), the scheme that is used (NGSI), a looping or static id (SensorThings) and even the number of messages and attributes (SensorThings).  
 
 | # | Backend | Scheme | Protocol | Static-Id | # of Messages | # of Attributes | API-Access | Summary |   
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |  
-| 1.1 | NGSI | POST-Always | - | yes/no | 1-n | 1-n | 1 POST with 'upsert' | 1 access |  
+| 1.1 | NGSI-XX | POST-Always | - | yes/no | 1-n | 1-n | 1 POST with 'upsert' | 1 access |  
 | 1.2 |  | PATCH/POST | - | yes/no | 1-n | 1-n | 1 PATCH and if not found, 1 POST afterwards (but only once per entity) | 1 access for known entities, <br>2 accesses for new entities |  
 | 2.1 | ServerThings | - | HTTP | yes | 1 | 1 | 1 GET on _Things_ to get the thing-id and if not found, 1 POST on _Things_ to create thing and 1 more GET to get thing-id from _Things_. 1 GET on Datastreams to get datastream-id and if not found, 1 POST on _Datastreams_ to create datastream and 1 more GET to get thing-id from _Datastreams_. 1 POST on _Observations_. | 7 accesses for a new Thing, <br>5 accesses for a known Thing and new Datastream, <br>3 accesses for known Thing and known Datastream |  
 | 2.2 |              | - |      | yes | n | 1 | 1 GET on _Things_ to get the thing-id and if not found, 1 POST on _Things_ to create thing and 1 more GET to get thing-id from _Things_. 1 GET on Datastreams to get datastream-id and if not found, 1 POST on _Datastreams_ to create datastream and 1 more GET to get thing-id from _Datastreams_. 1 POST on _Observations_. | Like 2.1 for the first message, 3 accesses for all others |  
@@ -226,8 +226,8 @@ In short: It depends on the current data-basis. If the entity doesn't exist yet,
 Let's start with the WHERE and WHAT - where do all those message go and what kind of server is that. 
 * **--server _[protocol]host-name_** \
 The server - you are running your test against - will look like _data.my-domain.com_ or maybe _127.0.0.1_. Sometimes you need a special port (_domain.com:9997_) and/or sub-directory (_domain.com:1234/server_). If you omit the protocol, _'https://'_ will be prepended, so if you want to access the server unsecured, your server-parameter will look like _http://domain..._ 
-* **--protocol _NGSI|SensorThings-MQTT|SensorThings-HTTP_** \
-Choose between _NGSI_ (the server is Orion Context Broker) and _SensorThings_ (here you have to choose between _HTTP_ and _MQTT_). If omitted, _NGSI_ is assumed.  
+* **--protocol _NGSI-V2|SensorThings-MQTT|SensorThings-HTTP_** \
+Choose between _NGSI-V2_ (the server is Orion Context Broker, V2) and _SensorThings_ (here you have to choose between _HTTP_ and _MQTT_). If omitted, _NGSI_ is assumed.  
 Please note: Even with _SensorThings-MQTT_, the HTTP-port of FROST will be used for finding out the Thing- and DataStream-id.  
 
 ## Define the Authorization (if needed)
@@ -245,7 +245,7 @@ This will create a Header, that looks like:
   
 ## Define the Scheme to be Used
 * **--insert-always** \
-[NGSI only] Storing Contexts in Orion Context Broker can be done in different ways. Two of them are used here: 
+[NGSI-V2 only] Storing Contexts in Orion Context Broker can be done in different ways. Two of them are used here: 
   * Try to update an Entity by PATCHing the data into a given _id_.  
     If this fails, because the entity does not exist yet, POST the data in order to create new entity. Next time, a PATCH on that _id_ will succeed.  
     The great advantage of this scheme is, that it gives you a "last chance" to perform some action (e.g. you can create a subscription on that _id_) in case, a new entity is introduced to the system.
@@ -279,12 +279,12 @@ Limits the sending of messages to the given frequency.
 We are almost ready to send our first message....but what's the use of empty messages without any content? They will probably got tagged "Return to Sender".  
 After a short discussion on how to set up your payload, we will send our first message - I promise!
 * **--tenant _name_** \
-[NGSI only] This tenant will be used in the Request-Header like this:
+[NGSI-V2 only] This tenant will be used in the Request-Header like this:
   ```html
    'service-name': 'YOUR-tenant-GOES-HERE'
   ```
 * **--type _name_** \
-[NGSI only] Type will be stored within the payload and (if set) is the unique identifier (together with the id) of an entity within Orion Context Broker. That means: You can have the same _id_ with different _types_:  
+[NGSI-V2 only] Type will be stored within the payload and (if set) is the unique identifier (together with the id) of an entity within Orion Context Broker. That means: You can have the same _id_ with different _types_:  
   ```json
   {
     "id":"1",
@@ -312,11 +312,11 @@ As with all other attributes: The _name_ of the attribute is stored within the p
 * **--attribute-string _name value_** \
 Simple enough...a string-literal will be stored.
 * **--attribute-date _name_** \
-[NGSI only] Same here: The current Date-Time (local time of the machine, opensim.py is executed on in "ISO 8601"-format) will be stored.
+[NGSI-V2 only] Same here: The current Date-Time (local time of the machine, opensim.py is executed on in "ISO 8601"-format) will be stored.
 * **--attribute-location _name,lat,long[,max-lat,max-long]_** \
-[NGSI only] Stores a location (in "geo:json"-format). Like with number, setting max-lat and max-long will result in a random location within the given range.
+[NGSI-V2 only] Stores a location (in "geo:json"-format). Like with number, setting max-lat and max-long will result in a random location within the given range.
 * **--attribute-boolean _name value_** \
-[NGSI only] Nothing interesting here.
+[NGSI-V2 only] Nothing interesting here.
 
 ## Useful
 * **--dry-run** \

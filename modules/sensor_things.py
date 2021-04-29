@@ -46,32 +46,30 @@ def init_mqtt(host):
     return mqtt_client
 
 
-def delete_thing(session, host, thing_id, x_api_key):
+def delete_thing(session, host, thing_id, args):
     url = "%s/v1.1/Things(%i)" % (host, thing_id)
 
     headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
 
-    if x_api_key is not None:
-        headers[helper.X_GRAVITEE_API_KEY] = x_api_key
+    headers.update(args.headers)
 
     return session.delete(url, headers=headers)
 
 
-def create_thing(session, host, thing_name, indent, x_api_key):
+def create_thing(session, host, thing_name, args):
     try:
         url = "%s/v1.1/Things" % host
 
         headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
 
-        if x_api_key is not None:
-            headers[helper.X_GRAVITEE_API_KEY] = x_api_key
+        headers.update(args.headers)
 
-        payload = helper.create_thing_payload(thing_name, indent)
+        payload = helper.create_thing_payload(thing_name, args.indent)
 
         resp = session.post(url, data=payload, headers=headers)
 
         if resp.status_code == 201:
-            thing_id, ms2 = get_thing_id(session, host, thing_name, x_api_key)
+            thing_id, ms2 = get_thing_id(session, host, thing_name, args)
 
             return thing_id, resp
 
@@ -81,23 +79,22 @@ def create_thing(session, host, thing_name, indent, x_api_key):
     return INVALID_ID, resp
 
 
-def create_data_stream(session, host, thing_id, data_stream_name, indent, x_api_key):
+def create_data_stream(session, host, thing_id, data_stream_name, args):
     try:
         url = "%s/v1.1/Things(%i)/Datastreams" % (host, thing_id)
 
         headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
 
-        if x_api_key is not None:
-            headers[helper.X_GRAVITEE_API_KEY] = x_api_key
+        headers.update(args.headers)
 
-        payload = helper.create_data_stream_payload(data_stream_name, indent)
+        payload = helper.create_data_stream_payload(data_stream_name, args.indent)
 
         resp = session.post(url, data=payload, headers=headers)
         ms = int(resp.elapsed.total_seconds() * 1000)
 
         if resp.status_code == 201:
             thing_id, ms2 = get_data_stream_id(
-                session, host, thing_id, data_stream_name, x_api_key
+                session, host, thing_id, data_stream_name, args
             )
 
             ms = int((ms + ms2) / 2)
@@ -110,9 +107,8 @@ def create_data_stream(session, host, thing_id, data_stream_name, indent, x_api_
 
 
 def create_observation(
-    mqtt_client, session, host, use_mqtt, data_stream_id, value, indent, x_api_key
-):
-    payload = helper.create_observation_payload(value, indent)
+    mqtt_client, session, host, use_mqtt, data_stream_id, value, args):
+    payload = helper.create_observation_payload(value, args.indent)
 
     if use_mqtt:
         topic = "v1.1/Datastreams(%i)/Observations" % data_stream_id
@@ -127,8 +123,7 @@ def create_observation(
 
             headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
 
-            if x_api_key is not None:
-                headers[helper.X_GRAVITEE_API_KEY] = x_api_key
+            headers.update(args.headers)
 
             return session.post(url, data=payload, headers=headers)
 
@@ -136,14 +131,13 @@ def create_observation(
             return None
 
 
-def get_thing_id(session, host, thing_name, x_api_key):
+def get_thing_id(session, host, thing_name, args):
     try:
         url = "%s/v1.1/Things?$select=name,id&$filter=name eq '%s'" % (host, thing_name)
 
         headers = {}
 
-        if x_api_key is not None:
-            headers[helper.X_GRAVITEE_API_KEY] = x_api_key
+        headers.update(args.headers)
 
         resp = session.get(url, headers=headers)
 
@@ -164,7 +158,7 @@ def get_thing_id(session, host, thing_name, x_api_key):
     return INVALID_ID, resp
 
 
-def get_data_stream_id(session, host, thing_id, data_stream_name, x_api_key):
+def get_data_stream_id(session, host, thing_id, data_stream_name, args):
     try:
         url = "%s/v1.1/Things(%i)/Datastreams?$select=name,id&$filter=name eq '%s'" % (
             host,
@@ -174,8 +168,7 @@ def get_data_stream_id(session, host, thing_id, data_stream_name, x_api_key):
 
         headers = {}
 
-        if x_api_key is not None:
-            headers[helper.X_GRAVITEE_API_KEY] = x_api_key
+        headers.update(args.headers)
 
         resp = session.get(url, headers=headers)
 

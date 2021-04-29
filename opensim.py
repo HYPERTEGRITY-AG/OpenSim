@@ -32,20 +32,14 @@ def do_delete(session, lock, args, max_id_length):
 
     headers = {}
 
-    if args.x_api_key is not None:
-        headers[helper.X_GRAVITEE_API_KEY] = args.x_api_key
-    elif args.bearer is not None:
-        headers[helper.AUTHORIZATION] = "Bearer " + args.bearer
-
-    if args.tenant is not None:
-        headers[helper.FIWARE_SERVICE] = args.tenant
+    headers.update(args.headers)
 
     for i in range(args.delete[0], args.delete[1] + 1):
         if halt:
             return
         connection_error = False
 
-        if args.protocol == helper.PROTOCOL_NGSI:
+        if args.protocol == helper.PROTOCOL_NGSI_V2 or args.protocol == helper.PROTOCOL_NGSI_LD:
             resp = ngsi.do_delete(session, host, i, headers, args)
             if resp is None:
                 connection_error = True
@@ -57,7 +51,11 @@ def do_delete(session, lock, args, max_id_length):
                 else:
                     errors += 1
         else:
-            thing_name = helper.create_id(i, args.prefix, args.postfix, 0)
+            thing_name = helper.create_id(i,
+                                          args.prefix,
+                                          args.postfix,
+                                          0,
+                                          False)
             thing_id, ms = sensor_things.get_thing_id(
                 session, host, thing_name, args.x_api_key
             )
@@ -67,7 +65,7 @@ def do_delete(session, lock, args, max_id_length):
                 resp.status_code = 404
             else:
                 resp = sensor_things.delete_thing(
-                    session, host, thing_id, args.x_api_key
+                    session, host, thing_id, args
                 )
                 if resp.status_code == 200:
                     deleted += 1
@@ -102,9 +100,11 @@ def do_delete(session, lock, args, max_id_length):
                         "%s%s  ??? %s"
                         % (
                             delimiter,
-                            helper.create_id(
-                                i, args.prefix, args.postfix, max_id_length
-                            ),
+                            helper.create_id(i,
+                                             args.prefix,
+                                             args.postfix,
+                                             max_id_length,
+                                             args.protocol == helper.PROTOCOL_NGSI_LD),
                             error_as_string,
                         ),
                         end="",
@@ -114,9 +114,11 @@ def do_delete(session, lock, args, max_id_length):
                         "%s%s  %3i %s"
                         % (
                             delimiter,
-                            helper.create_id(
-                                i, args.prefix, args.postfix, max_id_length
-                            ),
+                            helper.create_id(i,
+                                             args.prefix,
+                                             args.postfix,
+                                             max_id_length,
+                                             args.protocol == helper.PROTOCOL_NGSI_LD),
                             resp.status_code,
                             " ".join(resp.text.split())[0:120],
                         ),
@@ -150,16 +152,10 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
         if halt:
             return
 
-        if args.protocol == helper.PROTOCOL_NGSI:
+        if args.protocol == helper.PROTOCOL_NGSI_V2:
             headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
 
-            if args.tenant is not None:
-                headers[helper.FIWARE_SERVICE] = args.tenant
-
-            if args.x_api_key is not None:
-                headers[helper.X_GRAVITEE_API_KEY] = args.x_api_key
-            elif args.bearer is not None:
-                headers[helper.AUTHORIZATION] = "Bearer " + args.bearer
+            headers.update(args.headers)
 
             if args.insert_always:
                 resp, payload = ngsi.do_post(
@@ -218,9 +214,11 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     if resp is None:
                         print(
                             "%s  ???  ---- Connection Error!"
-                            % helper.create_id(
-                                first_id, args.prefix, args.postfix, max_id_length
-                            )
+                            % helper.create_id(first_id,
+                                               args.prefix,
+                                               args.postfix,
+                                               max_id_length,
+                                               args.protocol == helper.PROTOCOL_NGSI_LD)
                         )
                     else:
                         message = " ".join(resp.text.split())[0:120]
@@ -240,9 +238,96 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                         print(
                             "%s  %3i  %4i %s"
                             % (
-                                helper.create_id(
-                                    first_id, args.prefix, args.postfix, max_id_length
-                                ),
+                                helper.create_id(first_id,
+                                                 args.prefix,
+                                                 args.postfix,
+                                                 max_id_length,
+                                                 args.protocol == helper.PROTOCOL_NGSI_LD),
+                                resp.status_code,
+                                ms,
+                                message,
+                            )
+                        )
+        elif args.protocol == helper.PROTOCOL_NGSI_LD:
+            # since there is no "?options=upsert" in LD, we have always patch/post scheme
+            headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON_LD}
+
+            headers.update(args.headers)
+
+            # since there is no "?options=upsert" in LD, we have always patch/post scheme
+            resp, payload = ngsi.do_patch(session, host, first_id, headers, args)
+            if resp is None:
+                ms = 0
+                okay = False
+            else:
+                ms = int(resp.elapsed.total_seconds() * 1000)
+                if resp.status_code == 404:
+                    resp, payload = ngsi.do_post(
+                        session, host, first_id, headers, False, args
+                    )
+                    if resp is None:
+                        ms = 0
+                        okay = False
+                    else:
+                        ms += int(resp.elapsed.total_seconds() * 1000)
+                        okay = resp.status_code == 201
+                else:
+                    okay = True
+
+            with lock:
+                if not okay:
+                    errors += 1
+                    if resp is None:
+                        error_as_string = "Connection Error"
+                    else:
+                        error_as_string = (
+                            str(resp.status_code)
+                            + " "
+                            + " ".join(resp.text.split())[0:120]
+                        )
+
+                    if error_as_string in unique_errors.keys():
+                        num = unique_errors[error_as_string]
+                        unique_errors[error_as_string] = num + 1
+                    else:
+                        unique_errors[error_as_string] = 1
+
+                overall_time += ms
+                overall_messages += 1
+
+                if args.verbose:
+                    if resp is None:
+                        print(
+                            "%s  ???  ---- Connection Error!"
+                            % helper.create_id(first_id,
+                                               args.prefix,
+                                               args.postfix,
+                                               max_id_length,
+                                               args.protocol == helper.PROTOCOL_NGSI_LD)
+                        )
+                    else:
+                        message = " ".join(resp.text.split())[0:120]
+                        # There is this funny thing that Orion sometimes tells
+                        # us about 400 ParseError
+                        if resp.status_code == 400:
+                            message += "\nPayload was:\n" + payload
+
+                            # try to resend
+                            # if insert_always:
+                            #     url = host + "/v2/entities/?options=upsert"
+                            #
+                            #     resp = session.post(url, data=payload, headers=headers)
+
+                            # In 100%, resending exactly the same payload again gives a 201
+
+                        print(
+                            "%s  %3i  %4i %s"
+                            % (
+                                helper.create_id(first_id,
+                                                 args.prefix,
+                                                 args.postfix,
+                                                 max_id_length,
+                                                 args.protocol == helper.PROTOCOL_NGSI_LD),
                                 resp.status_code,
                                 ms,
                                 message,
@@ -266,9 +351,11 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                         okay = True
 
                         if thing_id == sensor_things.INVALID_ID:
-                            thing_name = helper.create_id(
-                                first_id, args.prefix, args.postfix, 0
-                            )
+                            thing_name = helper.create_id(first_id,
+                                                          args.prefix,
+                                                          args.postfix,
+                                                          0,
+                                                          args.protocol == helper.PROTOCOL_NGSI_LD)
 
                             #  check, if the thing with the given name (thing_name) already exists:
                             thing_id, resp = sensor_things.get_thing_id(
@@ -282,8 +369,7 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                                     session,
                                     host,
                                     thing_name,
-                                    args.indent,
-                                    args.x_api_key,
+                                    args
                                 )
                                 if resp.status_code != 201:
                                     okay = False
@@ -437,18 +523,22 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     if resp is None:
                         print(
                             "%s  ???  ---- Connection Error!"
-                            % helper.create_id(
-                                first_id, args.prefix, args.postfix, max_id_length
-                            )
+                            % helper.create_id(first_id,
+                                               args.prefix,
+                                               args.postfix,
+                                               max_id_length,
+                                               args.protocol == helper.PROTOCOL_NGSI_LD)
                         )
                     else:
                         message = " ".join(resp.text.split())[0:120]
                         print(
                             "%s  %3i  %4i %s"
                             % (
-                                helper.create_id(
-                                    first_id, args.prefix, args.postfix, max_id_length
-                                ),
+                                helper.create_id(first_id,
+                                                 args.prefix,
+                                                 args.postfix,
+                                                 max_id_length,
+                                                 args.protocol == helper.PROTOCOL_NGSI_LD),
                                 resp.status_code,
                                 ms,
                                 message,
