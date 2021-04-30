@@ -154,10 +154,7 @@ def parse_arguments():
         dest="headers",
         action="append",
         nargs=2,
-        help="Define a header by key and value. Examples: "
-             "-x Authorization \"Bearer INSERT_BEARER_TOKEN_HERE\"; "
-             "-x Fiware-service INSERT_TENANT_HERE; "
-             "-x X-Gravitee-Api-Key INSERT_API_KEY_HERE.",
+        help="Define a header by key and value.",
     )
 
     parser.add_argument(
