@@ -397,11 +397,12 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                         ):
                             with lock:  # since we might be running in more than one thread!
                                 data_stream_name = attribute_args[0]
-                                data_stream_id, ms2 = sensor_things.get_data_stream_id(session,
-                                                                                       host,
-                                                                                       thing_id,
-                                                                                       data_stream_name,
-                                                                                       args)
+                                data_stream_id, ms2 = \
+                                    sensor_things.get_data_stream_id(session,
+                                                                     host,
+                                                                     thing_id,
+                                                                     data_stream_name,
+                                                                     args)
 
                                 ms = int((ms + ms2) / 2)
 

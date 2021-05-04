@@ -166,11 +166,12 @@ This will delete all IDs starting from 100 to 200 (inclusive).
 ## Why Not Simply Use "curl" or "Postman/Newman"?
 While it's easy to think about a shell script, that runs curl in a loop adding data via the backend's REST-Api, one important drawback is, that if your server is TLS-secured ('https://...), curl isn't able to cache that TLS-handshake. That means, that EVERY call will do this handshake ending up in response times like one or more seconds. It's hard to generate load this way with hundreds of messages per second. Putting more than one URL in a single curl is a solution for this, but it's hard to aggregate the results and what, if there is more logic needed (e.g. Call this URL after that URL, but only if the first call gave you an 404...)  
 
-Postman is a nice "alternative" for curl - not only because of its nice UI and tons of useful features. Beside all of that, it is able to run in a batch mode (together with Newman) AND it caches TLS-handshakes as well! But still it's hard to generate load, since Postman is resource consuming and when you run more than one instance simultaneously, you'll soon find out your test-machine is the bottleneck. 
+Postman is a nice "alternative" for curl - not only because of its nice UI and tons of useful features. Beside all of that, it is able to run in a batch mode (together with Newman), AND it caches TLS-handshakes as well! But still it's hard to generate load, since Postman is resource consuming and when you run more than one instance simultaneously, you'll soon find out your test-machine is the bottleneck. 
 
 # Supported Backends
 This script is tested with:
 * Orion Context Broker, 2.5.0
+* Orion-LD, alpha-0.4.0 
 * FROST-Server, 1.13.0-SNAPSHOT  
 
 Other versions may be compatible, but we do not currently run tests against those.
@@ -287,7 +288,7 @@ When used with _--unlimited_, sets the timeout.
 Limits the sending of messages to the given frequency.
 
 ## Define the Payload
-We are almost ready to send our first message....but what's the use of empty messages without any content? They will probably got tagged "Return to Sender".  
+We are almost ready to send our first message....but what's the use of empty messages without any content? They will probably get tagged "Return to Sender".  
 After a short discussion on how to set up your payload, we will send our first message - I promise!
 * **--type _name_** \
 [NGSI-V2 only] Type will be stored within the payload and (if set) is the unique identifier (together with the id) of an entity within Orion Context Broker. That means: You can have the same _id_ with different _types_:  
@@ -318,9 +319,9 @@ As with all other attributes: The _name_ of the attribute is stored within the p
 * **--attribute-string _name value_** \
 Simple enough...a string-literal will be stored.
 * **--attribute-date _name_** \
-[NGSI-V2 only] Same here: The current Date-Time (local time of the machine, opensim.py is executed on in "ISO 8601"-format) will be stored.
+[NGSI-V2 only] Same here: The current Date-Time (local time of the machine, opensim.py is executed on in 'ISO 8601'-format) will be stored.
 * **--attribute-location _name,lat,long[,max-lat,max-long]_** \
-[NGSI-V2 only] Stores a location (in "geo:json"-format). Like with number, setting max-lat and max-long will result in a random location within the given range.
+[NGSI-V2 only] Stores a location (in 'geo:json'-format). Like with number, setting max-lat and max-long will result in a random location within the given range.
 * **--attribute-boolean _name value_** \
 [NGSI-V2 only] Nothing interesting here.
 
