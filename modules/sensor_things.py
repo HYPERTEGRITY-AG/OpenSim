@@ -106,8 +106,7 @@ def create_data_stream(session, host, thing_id, data_stream_name, args):
     return INVALID_ID, ms
 
 
-def create_observation(
-    mqtt_client, session, host, use_mqtt, data_stream_id, value, args):
+def create_observation(mqtt_client, session, host, use_mqtt, data_stream_id, value, args):
     payload = helper.create_observation_payload(value, args.indent)
 
     if use_mqtt:

@@ -56,9 +56,7 @@ def do_delete(session, lock, args, max_id_length):
                                           args.postfix,
                                           0,
                                           False)
-            thing_id, ms = sensor_things.get_thing_id(
-                session, host, thing_name, args.x_api_key
-            )
+            thing_id, ms = sensor_things.get_thing_id(session, host, thing_name, args)
             if thing_id == sensor_things.INVALID_ID:
                 not_deleted += 1
                 resp = requests.Response()
@@ -358,9 +356,10 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                                                           args.protocol == helper.PROTOCOL_NGSI_LD)
 
                             #  check, if the thing with the given name (thing_name) already exists:
-                            thing_id, resp = sensor_things.get_thing_id(
-                                session, host, thing_name, args.x_api_key
-                            )
+                            thing_id, resp = sensor_things.get_thing_id(session,
+                                                                        host,
+                                                                        thing_name,
+                                                                        args)
                             if resp is None:
                                 okay = False
                             elif resp.status_code == 404:
@@ -398,13 +397,11 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                         ):
                             with lock:  # since we might be running in more than one thread!
                                 data_stream_name = attribute_args[0]
-                                data_stream_id, ms2 = sensor_things.get_data_stream_id(
-                                    session,
-                                    host,
-                                    thing_id,
-                                    data_stream_name,
-                                    args.x_api_key,
-                                )
+                                data_stream_id, ms2 = sensor_things.get_data_stream_id(session,
+                                                                                       host,
+                                                                                       thing_id,
+                                                                                       data_stream_name,
+                                                                                       args)
 
                                 ms = int((ms + ms2) / 2)
 
@@ -414,14 +411,11 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                                     (
                                         data_stream_id,
                                         ms2,
-                                    ) = sensor_things.create_data_stream(
-                                        session,
-                                        host,
-                                        thing_id,
-                                        data_stream_name,
-                                        args.indent,
-                                        args.x_api_key,
-                                    )
+                                    ) = sensor_things.create_data_stream(session,
+                                                                         host,
+                                                                         thing_id,
+                                                                         data_stream_name,
+                                                                         args)
                                     ms = int((ms + ms2) / 2)
                                     if data_stream_id == sensor_things.ERROR:
                                         okay = False
@@ -437,9 +431,7 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                             args.protocol == helper.PROTOCOL_SENSOR_THINGS_MQTT,
                             data_stream_id,
                             value,
-                            args.indent,
-                            args.x_api_key,
-                        )
+                            args)
 
                         if resp is not None:
                             ms2 = int(resp.elapsed.total_seconds() * 1000)
@@ -452,13 +444,11 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     for string in args.strings:
                         data_stream_name = string[0]
                         with lock:  # since we might be running in more than one thread, use lock!
-                            data_stream_id, ms2 = sensor_things.get_data_stream_id(
-                                session,
-                                host,
-                                thing_id,
-                                data_stream_name,
-                                args.x_api_key,
-                            )
+                            data_stream_id, ms2 = sensor_things.get_data_stream_id(session,
+                                                                                   host,
+                                                                                   thing_id,
+                                                                                   data_stream_name,
+                                                                                   args)
 
                             ms = int((ms + ms2) / 2)
 
@@ -470,9 +460,7 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                                     host,
                                     thing_id,
                                     data_stream_name,
-                                    args.indent,
-                                    args.x_api_key,
-                                )
+                                    args)
                                 ms = int((ms + ms2) / 2)
                                 if data_stream_id == sensor_things.ERROR:
                                     okay = False
@@ -486,9 +474,7 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                             args.protocol == helper.PROTOCOL_SENSOR_THINGS_MQTT,
                             data_stream_id,
                             string[1],
-                            args.indent,
-                            args.x_api_key,
-                        )
+                            args)
 
                         if resp is not None:
                             ms2 = int(resp.elapsed.total_seconds() * 1000)
