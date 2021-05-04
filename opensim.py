@@ -32,7 +32,8 @@ def do_delete(session, lock, args, max_id_length):
 
     headers = {}
 
-    headers.update(args.headers)
+    if args.headers is not None:
+        headers.update(args.headers)
 
     for i in range(args.delete[0], args.delete[1] + 1):
         if halt:
@@ -153,7 +154,8 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
         if args.protocol == helper.PROTOCOL_NGSI_V2:
             headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
 
-            headers.update(args.headers)
+            if args.headers is not None:
+                headers.update(args.headers)
 
             if args.insert_always:
                 resp, payload = ngsi.do_post(
@@ -250,7 +252,8 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
             # since there is no "?options=upsert" in LD, we have always patch/post scheme
             headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON_LD}
 
-            headers.update(args.headers)
+            if args.headers is not None:
+                headers.update(args.headers)
 
             # since there is no "?options=upsert" in LD, we have always patch/post scheme
             resp, payload = ngsi.do_patch(session, host, first_id, headers, args)

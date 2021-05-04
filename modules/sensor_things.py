@@ -51,7 +51,8 @@ def delete_thing(session, host, thing_id, args):
 
     headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
 
-    headers.update(args.headers)
+    if args.headers is not None:
+        headers.update(args.headers)
 
     return session.delete(url, headers=headers)
 
@@ -62,7 +63,8 @@ def create_thing(session, host, thing_name, args):
 
         headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
 
-        headers.update(args.headers)
+        if args.headers is not None:
+            headers.update(args.headers)
 
         payload = helper.create_thing_payload(thing_name, args.indent)
 
@@ -85,7 +87,8 @@ def create_data_stream(session, host, thing_id, data_stream_name, args):
 
         headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
 
-        headers.update(args.headers)
+        if args.headers is not None:
+            headers.update(args.headers)
 
         payload = helper.create_data_stream_payload(data_stream_name, args.indent)
 
@@ -122,7 +125,8 @@ def create_observation(mqtt_client, session, host, use_mqtt, data_stream_id, val
 
             headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
 
-            headers.update(args.headers)
+            if args.headers is not None:
+                headers.update(args.headers)
 
             return session.post(url, data=payload, headers=headers)
 
@@ -136,7 +140,8 @@ def get_thing_id(session, host, thing_name, args):
 
         headers = {}
 
-        headers.update(args.headers)
+        if args.headers is not None:
+            headers.update(args.headers)
 
         resp = session.get(url, headers=headers)
 
@@ -167,7 +172,8 @@ def get_data_stream_id(session, host, thing_id, data_stream_name, args):
 
         headers = {}
 
-        headers.update(args.headers)
+        if args.headers is not None:
+            headers.update(args.headers)
 
         resp = session.get(url, headers=headers)
 
