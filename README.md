@@ -16,13 +16,12 @@ $ ./opensim.py -s http://myserver.com -p NGSI-V2 -ad dateObserved -an temperatur
 And if you don't want to read this documentation at all: Remember that you can use --help at any time! :-)
 ```commandline
 $ ./opensim.py -h
-opensim.py, Copyright (c) 2021 Will Freitag, Version 1.0.0
+opensim.py, Copyright (c) 2021 Will Freitag, Version 1.1.0
 usage: opensim.py [-h] -s
-                  [protocol]host-name [-p {NGSI-V2,SensorThings-MQTT,SensorThings-HTTP}]
-                  [-i] [-a id] [-x API-Key | -b token] [-f id] [-e PREFIX]
-                  [-o POSTFIX] [-c] [-n num] [-m num] [-u] [-q milliseconds]
-                  [-l seconds] [-t name] [-y name]
-                  [-an name,type,number[,max-number]] [-as name value]
+                  [protocol]host-name [-p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}]
+                  [-i] [-a id] [-x key value] [-f id] [-e PREFIX] [-o POSTFIX]
+                  [-c] [-n num] [-m num] [-u] [-q milliseconds] [-l seconds]
+                  [-y name] [-an name,type,number[,max-number]] [-as name value]
                   [-ad name] [-al name,lat,long[,max-lat,max-long]]
                   [-ab name value] [-ai indent] [-r] [-v] [-d from to]
 
@@ -32,10 +31,10 @@ optional arguments:
   -h, --help            show this help message and exit
   -s [protocol]host-name, --server [protocol]host-name
                         This host-name will be prepended by "https://", if
-                        protocol is omitted and appended with
-                        "/v2/entities/[?options=upsert]" or "/v1.1/..." resp.
-                        depending on the server-type (-p/--protocol).
-  -p {NGSI-V2,SensorThings-MQTT,SensorThings-HTTP}, --protocol {NGSI-V2,SensorThings-MQTT,SensorThings-HTTP}
+                        protocol is omitted and appended with "/v2/" (NGSI-V2),
+                        "/ngsi-ld/v1" (NGSI-LD) or "/v1.1/" (SensorThings) resp.
+                        depending on the server-type (see -p/--protocol).
+  -p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}, --protocol {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}
                         Define the type of server. [Default: NGSI-V2]
   -i, --insert-always   [Only NGSI-V2!] If set, the contexts will always be
                         inserted (via POST with option 'upsert') instead of
@@ -47,12 +46,8 @@ optional arguments:
                         used for ALL Observations, instead of first searching
                         for the Thing by it's name and the correct Datastream-Id
                         afterwards.
-  -x API-Key, --x-api-key API-Key
-                        Define an X-API-KEY (Will be used in the header as
-                        'X-Gravitee-Api-Key').
-  -b token, --bearer token
-                        Define a bearer token (Will be used in the header as
-                        'Authorization' with a prepended 'Bearer ').
+  -x key value, --header key value
+                        Define a header by key and value.
   -f id, --first-id id  Define the first id to be used or the one to be used if
                         '-c/--static-id' is set. [Default: 1]
   -e PREFIX, --prefix PREFIX
@@ -78,11 +73,8 @@ optional arguments:
   -l seconds, --limit-time seconds
                         Only in conjunction with '-u/--unlimited': Stops after
                         the given time in seconds.
-  -t name, --tenant name
-                        [Only NGSI-V2!] This tenant-name will be used as service-
-                        name in Orion Context Broker.
-  -y name, --type name  [Only NGSI-V2!] If set, this type-name will be used in the
-                        payload.
+  -y name, --type name  [Only NGSI-V2 and NGSI-LD!] If set, this type-name will
+                        be used in the payload.
   -an name,type,number[,max-number], --attribute-number name,type,number[,max-number]
                         Define a number attribute used for the payload by 'name'
                         (The name of the attribute, e.g.: temperature), 'type'
@@ -130,15 +122,25 @@ optional arguments:
                         "from" and "to") will be deleted.
 
 Example #1:
-./opensim.py -s my-host.com -b 039ea6d72a2f32227c2110bd8d78aae33acd6782 -t
-curltest
-The id will be increased with every message sent (starting with [first-id]).
-The tenant ['curltest' in the example above] will be used as 'fiware-service' in
-the header of the post.
+./opensim.py -s my-host.com -x Authorization 'Bearer
+039ea6d72a2f32227c2110bd8d78aae33acd6782' -x Fiware-service curltest
+One message is sent using id '1'.
+The tenant 'curltest' will be used as 'Fiware-service' in the header of the
+post.
 
 Example #2:
-The payload that will be sent will be constructed from the -y and the -aX
-parameters. Example:
+./opensim.py -s my-host.com -n 2 -m 50 ...
+100 messages will be sent (2 threads are sending 50 messages each).The id will
+be looped from '1' to '100'.
+
+Example #3:
+./opensim.py -s my-host.com -n 5 -m 100 -f 123 -c ...
+500 messages will be sent (5 threads are sending 100 messages each).The id '123'
+(-f is first id) will be used for all messages (-c is static id).
+
+Example #4:
+The payload that will be sent is constructed from the -y and the -aX parameters.
+Example:
 ./opensim.py -y WeatherObserved -an temperature,f,-20,50 -an
 precipitation,i,1,20 ...
 will generate a payload looking like:
@@ -155,9 +157,9 @@ will generate a payload looking like:
   },
 }
 
-Example #3:
-./opensim.py -d 100 200 -s my-host.com -b
-039ea6d72a2f32227c2110bd8d78aae33acd6782
+Example #5:
+./opensim.py -d 100 200 -s my-host.com -x Authorization 'Bearer
+039ea6d72a2f32227c2110bd8d78aae33acd6782'
 
 This will delete all IDs starting from 100 to 200 (inclusive).
 ```
@@ -230,19 +232,28 @@ The server - you are running your test against - will look like _data.my-domain.
 Choose between _NGSI-V2_ (the server is Orion Context Broker, V2) and _SensorThings_ (here you have to choose between _HTTP_ and _MQTT_). If omitted, _NGSI_ is assumed.  
 Please note: Even with _SensorThings-MQTT_, the HTTP-port of FROST will be used for finding out the Thing- and DataStream-id.  
 
-## Define the Authorization (if needed)
-If your server is accessible directly, you can skip these parameters. If the server is behind some API-Management or reverse proxy, you may want to give some authorization within the (Request-) header using the following parameters:
-* **--x-api-key _API-Key_** \
+## Define Headers
+Headers are easily defined by key and value.
+* **--header key value** \
 This will create a Header, that looks like:
   ```
-  'X-Gravitee-Api-Key': 'YOUR-[API-Key]-GOES-HERE'
+  'key':'value'
   ```
-* **--bearer _token_** \
-This will create a Header, that looks like:
-  ```
-  'Authorization': 'Bearer YOUR-[token]-GOES-HERE'
-  ```
+  Examples:
+  ```html
+  --header X-Gravitee-Api-Key YOUR-API-KEY-GOES-HERE
+  Creates header:
+  'X-Gravitee-Api-Key':'YOUR-API-KEY-GOES-HERE'
   
+  --header Authorization "Bearer YOUR-TOKEN-GOES-HERE"
+  Creates header:
+  'Authorization':'Bearer YOUR-TOKEN-GOES-HERE'
+  
+  --header Fiware-service MY_TENANT
+  Creates header:
+  'Fiware-service':'MY_TENANT'
+  ```
+
 ## Define the Scheme to be Used
 * **--insert-always** \
 [NGSI-V2 only] Storing Contexts in Orion Context Broker can be done in different ways. Two of them are used here: 
@@ -278,11 +289,6 @@ Limits the sending of messages to the given frequency.
 ## Define the Payload
 We are almost ready to send our first message....but what's the use of empty messages without any content? They will probably got tagged "Return to Sender".  
 After a short discussion on how to set up your payload, we will send our first message - I promise!
-* **--tenant _name_** \
-[NGSI-V2 only] This tenant will be used in the Request-Header like this:
-  ```html
-   'service-name': 'YOUR-tenant-GOES-HERE'
-  ```
 * **--type _name_** \
 [NGSI-V2 only] Type will be stored within the payload and (if set) is the unique identifier (together with the id) of an entity within Orion Context Broker. That means: You can have the same _id_ with different _types_:  
   ```json
