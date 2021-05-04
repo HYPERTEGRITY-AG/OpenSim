@@ -161,6 +161,12 @@ def print_payload(args):
                 % helper.create_payload_ngsi_v2(None, False, args),
                 flush=True,
             )
+    elif args.protocol == helper.PROTOCOL_NGSI_LD:
+        print(
+            "The payload will look like:\n%s"
+            % helper.create_payload_ngsi_ld(args.first_id, args, True),
+            flush=True,
+        )
     else:
         thing_name = helper.create_id(args.first_id,
                                       args.prefix,
