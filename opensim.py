@@ -182,7 +182,8 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                             ms = 0
                         else:
                             ms += int(resp.elapsed.total_seconds() * 1000)
-                    if resp.status_code == 204:
+                    #  TODO: Check this!
+                    if resp.status_code == 204 or resp.status_code == 201:
                         okay = True
                     else:
                         okay = False
