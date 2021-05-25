@@ -174,20 +174,18 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     okay = False
                 else:
                     ms = int(resp.elapsed.total_seconds() * 1000)
-                    if resp.status_code >= 400:
-                        okay = False
-                    elif resp.status_code != 204:
+                    if resp.status_code == 404:
                         resp, payload = ngsi.do_post(
                             session, host, first_id, headers, False, args
                         )
                         if resp is None:
                             ms = 0
-                            okay = False
                         else:
                             ms += int(resp.elapsed.total_seconds() * 1000)
-                            okay = resp.status_code == 201
-                    else:
+                    if resp.status_code == 204:
                         okay = True
+                    else:
+                        okay = False
 
             with lock:
                 if not okay:
@@ -224,6 +222,7 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                         message = " ".join(resp.text.split())[0:120]
                         # There is this funny thing that Orion sometimes tells
                         # us about 400 ParseError
+                        # see https://github.com/telefonicaid/fiware-orion/issues/3731
                         if resp.status_code == 400:
                             message += "\nPayload was:\n" + payload
 
