@@ -176,8 +176,7 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     ms = int(resp.elapsed.total_seconds() * 1000)
                     if resp.status_code == 404:
                         resp, payload = ngsi.do_post(
-                            session, host, first_id, headers, False, args
-                        )
+                            session, host, first_id, headers, True, args)
                         if resp is None:
                             ms = 0
                         else:
