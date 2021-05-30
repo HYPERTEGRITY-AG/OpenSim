@@ -5,18 +5,19 @@ import random
 from datetime import datetime
 
 # some "consts"
-VERSION = "1.0.0"
-FIWARE_SERVICE = "fiware-service"
-X_GRAVITEE_API_KEY = "X-Gravitee-Api-Key"
-AUTHORIZATION = "Authorization"
-CONTENT_TYPE = "content-type"
+VERSION = "1.1.0"
+CONTENT_TYPE = "Content-Type"
 APPLICATION_JSON = "application/json"
-PROTOCOL_NGSI = "NGSI"
+# TODO: swagger says, content-type is "application/json;application/ld+json"!
+APPLICATION_JSON_LD = "application/ld+json"
+LD_PREFIX = "urn:"
+PROTOCOL_NGSI_V2 = "NGSI-V2"
+PROTOCOL_NGSI_LD = "NGSI-LD"
 PROTOCOL_SENSOR_THINGS_HTTP = "SensorThings-HTTP"
 PROTOCOL_SENSOR_THINGS_MQTT = "SensorThings-MQTT"
 
 
-def create_id(first_id, prefix, postfix, align):
+def create_id(first_id, prefix, postfix, align, is_ngsi_ld):
     ret = str(first_id)
 
     if prefix is not None:
@@ -24,6 +25,9 @@ def create_id(first_id, prefix, postfix, align):
 
     if postfix is not None:
         ret += postfix
+
+    if is_ngsi_ld:
+        ret = LD_PREFIX + ret
 
     if align == 0:
         return ret
@@ -135,11 +139,17 @@ def create_observation_payload(value, indent):
         return json.dumps(payload)
 
 
-def create_payload_ngsi(first_id, meta_data, args):
+def create_payload_ngsi_v2(first_id, meta_data, args):
     payload = dict()
     if meta_data:
         if first_id is not None:
-            payload["id"] = create_id(first_id, args.prefix, args.postfix, 0)
+            payload["id"] = create_id(
+                first_id,
+                args.prefix,
+                args.postfix,
+                0,
+                args.protocol == PROTOCOL_NGSI_LD,
+            )
         if args.type is not None:
             payload["type"] = args.type
 
@@ -160,6 +170,105 @@ def create_payload_ngsi(first_id, meta_data, args):
             # type
             if attribute_args[1] == "i" or attribute_args[1] == "f":
                 attr["type"] = "Number"
+
+            # value
+            value = create_value_from_attribute_args(attribute_args)
+            attr["value"] = value
+            payload[attribute_args[0]] = attr
+
+    if args.strings is not None:
+        for string in args.strings:
+            attr = {"type": "Text", "value": string[1]}
+            payload[string[0]] = attr
+
+    if args.booleans is not None:
+        for boolean in args.booleans:
+            attr = {"type": "Boolean"}
+
+            # value
+            if boolean[1] == "false":
+                attr["value"] = False
+            elif boolean[1] == "true":
+                attr["value"] = True
+            else:
+                attr["value"] = bool(random.getrandbits(1))
+            payload[boolean[0]] = attr
+
+    if args.locations is not None:
+        for location in args.locations:
+            attribute_args = location[0].split(",")
+
+            attr = {"type": "geo:json"}
+
+            # value
+            coord = {"type": "Point"}
+            lat_from = float(attribute_args[1])
+            long_from = float(attribute_args[2])
+            coord["coordinates"] = [lat_from, long_from]
+
+            if len(attribute_args) > 3:
+                lat_to = float(attribute_args[3])
+                long_to = float(attribute_args[4])
+                coord["coordinates"] = [
+                    random.uniform(lat_from, lat_to),
+                    random.uniform(long_from, long_to),
+                ]
+
+            attr["value"] = coord
+            payload[attribute_args[0]] = attr
+
+    if args.indent > 0:
+        return json.dumps(payload, indent=args.indent)
+    else:
+        return json.dumps(payload)
+
+
+def create_payload_ngsi_ld(first_id, args, is_post):
+    payload = dict()
+
+    if first_id is not None:
+        context = {
+            "id": create_id(
+                first_id,
+                args.prefix,
+                args.postfix,
+                0,
+                args.protocol == PROTOCOL_NGSI_LD,
+            ),
+            "type": args.type,
+        }
+    else:
+        context = {"type": args.type}
+    payload["@context"] = context
+
+    if is_post:
+        if first_id is not None:
+            payload["id"] = create_id(
+                first_id,
+                args.prefix,
+                args.postfix,
+                0,
+                args.protocol == PROTOCOL_NGSI_LD,
+            )
+        payload["type"] = args.type
+
+    if args.date_times is not None:
+        for date_time in args.date_times:
+            attr = {
+                "type": "DateTime",
+                "value": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.00Z"),
+            }
+            payload[date_time[0]] = attr
+
+    if args.numbers is not None:
+        for number in args.numbers:
+            attribute_args = number[0].split(",")
+
+            attr = {}
+
+            # type
+            if attribute_args[1] == "i" or attribute_args[1] == "f":
+                attr["type"] = "Property"  # TODO: "Number" must be accepted!
 
             # value
             value = create_value_from_attribute_args(attribute_args)

@@ -73,7 +73,7 @@ def print_type_of_server(protocol):
 
 
 def print_schema(args):
-    if args.protocol == helper.PROTOCOL_NGSI:
+    if args.protocol == helper.PROTOCOL_NGSI_V2:
         if args.insert_always:
             print(
                 "Note: POST-always schema is used to store contexts. "
@@ -100,29 +100,57 @@ def print_id_used(args, msg_num):
     if args.static_id:
         print(
             'ID "%s" will be used for all messages.'
-            % helper.create_id(args.first_id, args.prefix, args.postfix, 0),
+            % helper.create_id(
+                args.first_id,
+                args.prefix,
+                args.postfix,
+                0,
+                args.protocol == helper.PROTOCOL_NGSI_LD,
+            ),
             flush=True,
         )
     else:
         if msg_num == 1:
             print(
                 'The used ID will be "%s".'
-                % helper.create_id(args.first_id, args.prefix, args.postfix, 0),
+                % helper.create_id(
+                    args.first_id,
+                    args.prefix,
+                    args.postfix,
+                    0,
+                    args.protocol == helper.PROTOCOL_NGSI_LD,
+                ),
                 flush=True,
             )
         elif args.unlimited:
             print(
                 'The used ID will be starting at "%s" and increase continuously.'
-                % helper.create_id(args.first_id, args.prefix, args.postfix, 0),
+                % helper.create_id(
+                    args.first_id,
+                    args.prefix,
+                    args.postfix,
+                    0,
+                    args.protocol == helper.PROTOCOL_NGSI_LD,
+                ),
                 flush=True,
             )
         else:
             print(
                 'The used ID will be from "%s" to "%s".'
                 % (
-                    helper.create_id(args.first_id, args.prefix, args.postfix, 0),
                     helper.create_id(
-                        args.first_id + msg_num - 1, args.prefix, args.postfix, 0
+                        args.first_id,
+                        args.prefix,
+                        args.postfix,
+                        0,
+                        args.protocol == helper.PROTOCOL_NGSI_LD,
+                    ),
+                    helper.create_id(
+                        args.first_id + msg_num - 1,
+                        args.prefix,
+                        args.postfix,
+                        0,
+                        args.protocol == helper.PROTOCOL_NGSI_LD,
                     ),
                 ),
                 flush=True,
@@ -130,21 +158,33 @@ def print_id_used(args, msg_num):
 
 
 def print_payload(args):
-    if args.protocol == helper.PROTOCOL_NGSI:
+    if args.protocol == helper.PROTOCOL_NGSI_V2:
         if args.insert_always:
             print(
                 "The payload will look like:\n%s"
-                % helper.create_payload_ngsi(args.first_id, True, args),
+                % helper.create_payload_ngsi_v2(args.first_id, True, args),
                 flush=True,
             )
         else:
             print(
                 "The payload will look like:\n%s"
-                % helper.create_payload_ngsi(None, False, args),
+                % helper.create_payload_ngsi_v2(None, False, args),
                 flush=True,
             )
+    elif args.protocol == helper.PROTOCOL_NGSI_LD:
+        print(
+            "The payload will look like:\n%s"
+            % helper.create_payload_ngsi_ld(args.first_id, args, True),
+            flush=True,
+        )
     else:
-        thing_name = helper.create_id(args.first_id, args.prefix, args.postfix, 0)
+        thing_name = helper.create_id(
+            args.first_id,
+            args.prefix,
+            args.postfix,
+            0,
+            args.protocol == helper.PROTOCOL_NGSI_LD,
+        )
 
         print(
             "The payload will look like:\nThing:\n%s\n\nDatastream: \n%s\n\nObservation: \n%s"
@@ -162,8 +202,20 @@ def print_will_delete(args):
         'Will delete %i contexts from "%s" to "%s".'
         % (
             args.delete[1] - args.delete[0] + 1,
-            helper.create_id(args.delete[0], args.prefix, args.postfix, 0),
-            helper.create_id(args.delete[1], args.prefix, args.postfix, 0),
+            helper.create_id(
+                args.delete[0],
+                args.prefix,
+                args.postfix,
+                0,
+                args.protocol == helper.PROTOCOL_NGSI_LD,
+            ),
+            helper.create_id(
+                args.delete[1],
+                args.prefix,
+                args.postfix,
+                0,
+                args.protocol == helper.PROTOCOL_NGSI_LD,
+            ),
         ),
         flush=True,
     )

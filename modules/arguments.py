@@ -36,22 +36,39 @@ def parse_arguments():
 
     # noinspection PyTypeChecker
     parser = argparse.ArgumentParser(
-        description="Tool to create some load on Orion Context " "Broker/FROST-Server.",
+        description="Tool to create some load on Orion Context Broker/FROST-Server.",
         formatter_class=MultiLineFormatter,
         allow_abbrev=False,
     )
 
     parser.epilog = (
         "Example #1:|n"
-        "./opensim.py -s my-host.com -b 039ea6d72a2f32227c2110bd8d78aae33acd6782 "
-        "-t curltest|n"
-        "The id will be increased with every message sent (starting "
-        "with [first-id]).|n"
-        "The tenant ['curltest' in the example above] will be used "
-        "as 'fiware-service' in the "
-        "header of the post.|n|n"
-        "Example #2:|n"
-        "The payload that will be sent will be constructed from the -y and "
+        "./opensim.py -s my-host.com -H Authorization "
+        "'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782' "
+        "-H Fiware-service curltest|n"
+        "One message is sent using id '1'.|n"
+        "The tenant 'curltest' will be used "
+        "as 'Fiware-service' in the "
+        "header of the post.|n"
+    )
+
+    parser.epilog += (
+        "|n|nExample #2:|n"
+        "./opensim.py -s my-host.com -n 2 -m 50 ...|n"
+        "100 messages will be sent (2 threads are sending 50 messages each)."
+        "The id will be looped from '1' to '100'.|n"
+    )
+
+    parser.epilog += (
+        "|n|nExample #3:|n"
+        "./opensim.py -s my-host.com -n 5 -m 100 -f 123 -c ...|n"
+        "500 messages will be sent (5 threads are sending 100 messages each)."
+        "The id '123' (-f is first id) will be used for all messages (-c is static id).|n"
+    )
+
+    parser.epilog += (
+        "|n|nExample #4:|n"
+        "The payload that will be sent is constructed from the -y and "
         "the -aX parameters. Example:|n"
         "./opensim.py -y WeatherObserved -an temperature,f,-20,50 "
         "-an precipitation,i,1,20 ...|n"
@@ -71,9 +88,9 @@ def parse_arguments():
     )
 
     parser.epilog += (
-        "|n|nExample #3:|n"
+        "|n|nExample #5:|n"
         "./opensim.py -d 100 200 -s my-host.com "
-        "-b 039ea6d72a2f32227c2110bd8d78aae33acd6782|n"
+        "-H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782'|n"
         "|n"
         "This will delete all IDs starting from 100 to 200 (inclusive)."
     )
@@ -85,8 +102,9 @@ def parse_arguments():
         dest="server",
         help='This host-name will be prepended by "https://", if protocol '
         "is omitted and appended "
-        'with "/v2/entities/[?options=upsert]" or "/v1.1/..." resp. '
-        "depending on the server-type (-p/--protocol).",
+        'with "/v2/" (NGSI-V2), "/ngsi-ld/v1" '
+        '(NGSI-LD) or "/v1.1/" (SensorThings) resp. '
+        "depending on the server-type (see -p/--protocol).",
         required=True,
     )
 
@@ -94,13 +112,14 @@ def parse_arguments():
         "-p",
         "--protocol",
         choices=[
-            helper.PROTOCOL_NGSI,
+            helper.PROTOCOL_NGSI_V2,
+            helper.PROTOCOL_NGSI_LD,
             helper.PROTOCOL_SENSOR_THINGS_MQTT,
             helper.PROTOCOL_SENSOR_THINGS_HTTP,
         ],
-        default=helper.PROTOCOL_NGSI,
+        default=helper.PROTOCOL_NGSI_V2,
         dest="protocol",
-        help="Define the type of server. [Default: %s]" % helper.PROTOCOL_NGSI,
+        help="Define the type of server. [Default: %s]" % helper.PROTOCOL_NGSI_V2,
     )
 
     parser.add_argument(
@@ -109,10 +128,9 @@ def parse_arguments():
         dest="insert_always",
         action="store_true",
         default=False,
-        help="[Only NGSI!] If set, the contexts will always be inserted "
+        help="[Only NGSI-V2 and NGSI-LD!] If set, the contexts will always be inserted "
         "(via POST with option 'upsert') instead "
-        "of trying to update first (via PATCH) and insert (via POST w/o "
-        "option 'upsert'), if not "
+        "of trying to update first (via PATCH) and insert (via POST), if not "
         "existing (i.e. PATCH returns '404 Not Found').",
     )
 
@@ -128,25 +146,14 @@ def parse_arguments():
         type=int,
     )
 
-    token_group = parser.add_mutually_exclusive_group()
-
-    token_group.add_argument(
-        "-x",
-        "--x-api-key",
-        metavar="API-Key",
-        dest="x_api_key",
-        help="Define an X-API-KEY (Will be used in the header "
-        "as 'X-Gravitee-Api-Key').",
-    )
-
-    token_group.add_argument(
-        "-b",
-        "--bearer",
-        metavar="token",
-        dest="bearer",
-        help="Define a bearer token (Will be used in the header "
-        "as 'Authorization' with a "
-        "prepended 'Bearer ').",
+    parser.add_argument(
+        "-H",
+        "--header",
+        metavar=("key", "value"),
+        dest="headers",
+        action="append",
+        nargs=2,
+        help="Define a header by key and value.",
     )
 
     parser.add_argument(
@@ -240,20 +247,11 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "-t",
-        "--tenant",
-        metavar="name",
-        dest="tenant",
-        help="[Only NGSI!] This tenant-name will be used as service-name in "
-        "Orion Context Broker.",
-    )
-
-    parser.add_argument(
         "-y",
         "--type",
         metavar="name",
         dest="type",
-        help="[Only NGSI!] If set, this type-name will be used in the payload.",
+        help="[Only NGSI-V2 and NGSI-LD!] If set, this type-name will be used in the payload.",
     )
 
     parser.add_argument(
@@ -294,7 +292,7 @@ def parse_arguments():
         dest="date_times",
         action="append",
         nargs=1,
-        help="[Only NGSI!] Define a DateTime attribute used for the payload "
+        help="[Only NGSI-V2!] Define a DateTime attribute used for the payload "
         "by 'name' "
         "(The name of the attribute, "
         "e.g.: dateObserved). Note: The current time is used as value. "
@@ -309,7 +307,7 @@ def parse_arguments():
         dest="locations",
         action="append",
         nargs=1,
-        help="[Only NGSI!] Define a location attribute used for the payload "
+        help="[Only NGSI-V2!] Define a location attribute used for the payload "
         "by 'name' (The name "
         "of the attribute, e.g.: position), 'lat' (The value for latitude) "
         "and 'long' "
@@ -328,7 +326,7 @@ def parse_arguments():
         dest="booleans",
         action="append",
         nargs=2,
-        help="[Only NGSI!] Define a boolean attribute used for the payload "
+        help="[Only NGSI-V2!] Define a boolean attribute used for the payload "
         "by 'name' "
         "(The name of the attribute, "
         "e.g.: public) and 'value' (One of 'true', 'false' or 'toggle' "
@@ -589,8 +587,21 @@ def check_arguments(parser, args):
                     )
 
         if not args.delete:
+            # check scheme?
+            if args.insert_always and (
+                args.protocol != helper.PROTOCOL_NGSI_V2
+                and args.protocol != helper.PROTOCOL_NGSI_LD
+            ):
+                parser.error(
+                    "Insert always scheme [-i/--insert-always] is only valid "
+                    "for NGSI-V2 and NGSI-LD!"
+                )
+
             # is there any payload?
-            if args.protocol == helper.PROTOCOL_NGSI:
+            if (
+                args.protocol == helper.PROTOCOL_NGSI_V2
+                or args.protocol != helper.PROTOCOL_NGSI_LD
+            ):
                 if (
                     ((args.numbers is None) or (len(args.numbers) == 0))
                     and ((args.booleans is None) or (len(args.booleans) == 0))

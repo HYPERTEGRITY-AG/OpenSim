@@ -10,137 +10,113 @@ For this to end, not the complete APIs of both, Orion and FROST are implemented 
 
 A simple call of this tool like...
 ```commandline
-$ ./opensim.py -s http://myserver.com -p NGSI -ad dateObserved -an temperature,f,20.5
+$ ./opensim.py -s http://myserver.com -p NGSI-V2 -ad dateObserved -an temperature,f,20.5
 ```
 ...will send one context to an Orion Context Broker at myserver.com with a payload defining a weather observation (date and temperature).  
 And if you don't want to read this documentation at all: Remember that you can use --help at any time! :-)
 ```commandline
 $ ./opensim.py -h
-opensim.py, Copyright (c) 2021 Will Freitag, Version 1.0.0
-usage: opensim.py [-h] -s
-                  [protocol]host-name [-p {NGSI,SensorThings-MQTT,SensorThings-HTTP}]
-                  [-i] [-a id] [-x API-Key | -b token] [-f id] [-e PREFIX]
-                  [-o POSTFIX] [-c] [-n num] [-m num] [-u] [-q milliseconds]
-                  [-l seconds] [-t name] [-y name]
-                  [-an name,type,number[,max-number]] [-as name value]
-                  [-ad name] [-al name,lat,long[,max-lat,max-long]]
-                  [-ab name value] [-ai indent] [-r] [-v] [-d from to]
+opensim.py, Copyright (c) 2021 Will Freitag, Version 1.1.0
+usage: opensim.py [-h] -s [protocol]host-name [-p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}]
+                  [-i] [-a id] [-H key value] [-f id] [-e PREFIX] [-o POSTFIX] [-c] [-n num] [-m num] [-u]
+                  [-q milliseconds] [-l seconds] [-y name] [-an name,type,number[,max-number]]
+                  [-as name value] [-ad name] [-al name,lat,long[,max-lat,max-long]] [-ab name value]
+                  [-ai indent] [-r] [-v] [-d from to]
 
 Tool to create some load on Orion Context Broker/FROST-Server.
 
 optional arguments:
   -h, --help            show this help message and exit
   -s [protocol]host-name, --server [protocol]host-name
-                        This host-name will be prepended by "https://", if
-                        protocol is omitted and appended with
-                        "/v2/entities/[?options=upsert]" or "/v1.1/..." resp.
-                        depending on the server-type (-p/--protocol).
-  -p {NGSI,SensorThings-MQTT,SensorThings-HTTP}, --protocol {NGSI,SensorThings-MQTT,SensorThings-HTTP}
-                        Define the type of server. [Default: NGSI]
-  -i, --insert-always   [Only NGSI!] If set, the contexts will always be
-                        inserted (via POST with option 'upsert') instead of
-                        trying to update first (via PATCH) and insert (via POST
-                        w/o option 'upsert'), if not existing (i.e. PATCH
-                        returns '404 Not Found').
+                        This host-name will be prepended by "https://", if protocol is omitted and
+                        appended with "/v2/" (NGSI-V2), "/ngsi-ld/v1" (NGSI-LD) or "/v1.1/" (SensorThings)
+                        resp. depending on the server-type (see -p/--protocol).
+  -p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}, --protocol {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}
+                        Define the type of server. [Default: NGSI-V2]
+  -i, --insert-always   [Only NGSI-V2 and NGSI-LD!] If set, the contexts will always be inserted (via POST
+                        with option 'upsert') instead of trying to update first (via PATCH) and insert
+                        (via POST), if not existing (i.e. PATCH returns '404 Not Found').
   -a id, --datastream-id id
-                        [Only SensorThings!] If set, this Datastream-Id will be
-                        used for ALL Observations, instead of first searching
-                        for the Thing by it's name and the correct Datastream-Id
-                        afterwards.
-  -x API-Key, --x-api-key API-Key
-                        Define an X-API-KEY (Will be used in the header as
-                        'X-Gravitee-Api-Key').
-  -b token, --bearer token
-                        Define a bearer token (Will be used in the header as
-                        'Authorization' with a prepended 'Bearer ').
-  -f id, --first-id id  Define the first id to be used or the one to be used if
-                        '-c/--static-id' is set. [Default: 1]
+                        [Only SensorThings!] If set, this Datastream-Id will be used for ALL Observations,
+                        instead of first searching for the Thing by it's name and the correct Datastream-
+                        Id afterwards.
+  -H key value, --header key value
+                        Define a header by key and value.
+  -f id, --first-id id  Define the first id to be used or the one to be used if '-c/--static-id' is set.
+                        [Default: 1]
   -e PREFIX, --prefix PREFIX
-                        If set, the prefix will be prepended to the generated
-                        id.
+                        If set, the prefix will be prepended to the generated id.
   -o POSTFIX, --postfix POSTFIX
-                        If set, the postfix will be appended to the generated
-                        id.
-  -c, --static-id       If set, the id will not increment (i.e. -n times -m
-                        messages will be sent with the same id ['-f/--first-id'
-                        or '1' if omitted]).
+                        If set, the postfix will be appended to the generated id.
+  -c, --static-id       If set, the id will not increment (i.e. -n times -m messages will be sent with the
+                        same id ['-f/--first-id' or '1' if omitted]).
   -n num, --num-threads num
                         Define, how many threads shall be used. [Default: 1]
   -m num, --messages num
-                        Define, how many messages per thread shall be sent
-                        (ignored, if '-u/--unlimited' ist set). [Default: 1]
-  -u, --unlimited       If set, '-m/--messages' is ignored and infinite messages
-                        will be send (in '-n/--num-threads' threads). Hit
-                        'Ctrl-C' to interrupt or set '-l/--limit-time'.
+                        Define, how many messages per thread shall be sent (ignored, if '-u/--unlimited'
+                        ist set). [Default: 1]
+  -u, --unlimited       If set, '-m/--messages' is ignored and infinite messages will be send (in
+                        '-n/--num-threads' threads). Hit 'Ctrl-C' to interrupt or set '-l/--limit-time'.
   -q milliseconds, --frequency milliseconds
-                        If set, limits the frequency of the messages sent to the
-                        given number (per thread!).
+                        If set, limits the frequency of the messages sent to the given number (per
+                        thread!).
   -l seconds, --limit-time seconds
-                        Only in conjunction with '-u/--unlimited': Stops after
-                        the given time in seconds.
-  -t name, --tenant name
-                        [Only NGSI!] This tenant-name will be used as service-
-                        name in Orion Context Broker.
-  -y name, --type name  [Only NGSI!] If set, this type-name will be used in the
-                        payload.
+                        Only in conjunction with '-u/--unlimited': Stops after the given time in seconds.
+  -y name, --type name  [Only NGSI-V2 and NGSI-LD!] If set, this type-name will be used in the payload.
   -an name,type,number[,max-number], --attribute-number name,type,number[,max-number]
-                        Define a number attribute used for the payload by 'name'
-                        (The name of the attribute, e.g.: temperature), 'type'
-                        (One of i [integer] or f [floating point])and 'number'
-                        (The value to be used). If 'max-number' is set, the
-                        number written will be randomly between 'number' and
-                        'max-number' (each including). Note: Multiple number
-                        attributes can be defined by repeating -an.
+                        Define a number attribute used for the payload by 'name' (The name of the
+                        attribute, e.g.: temperature), 'type' (One of i [integer] or f [floating
+                        point])and 'number' (The value to be used). If 'max-number' is set, the number
+                        written will be randomly between 'number' and 'max-number' (each including). Note:
+                        Multiple number attributes can be defined by repeating -an.
   -as name value, --attribute-string name value
-                        Define a string attribute used for the payload by 'name'
-                        (The name of the attribute, e.g.: instruction) and
-                        'value' (the actual string). Note: Multiple string
-                        attributes can be defined by repeating -as.
+                        Define a string attribute used for the payload by 'name' (The name of the
+                        attribute, e.g.: instruction) and 'value' (the actual string). Note: Multiple
+                        string attributes can be defined by repeating -as.
   -ad name, --attribute-date name
-                        [Only NGSI!] Define a DateTime attribute used for the
-                        payload by 'name' (The name of the attribute, e.g.:
-                        dateObserved). Note: The current time is used as value.
-                        Multiple DateTime attributes can be defined by repeating
-                        -ad.
+                        [Only NGSI-V2!] Define a DateTime attribute used for the payload by 'name' (The
+                        name of the attribute, e.g.: dateObserved). Note: The current time is used as
+                        value. Multiple DateTime attributes can be defined by repeating -ad.
   -al name,lat,long[,max-lat,max-long], --attribute-location name,lat,long[,max-lat,max-long]
-                        [Only NGSI!] Define a location attribute used for the
-                        payload by 'name' (The name of the attribute, e.g.:
-                        position), 'lat' (The value for latitude) and 'long'
-                        (The value for longitude). If 'max-lat' and 'max-long'
-                        are set, the location written will be randomly between
-                        'lat' and 'max-lat' and 'long' and 'max-long' resp.
-                        (each including). Note: Multiple location attributes can
-                        be defined by repeating -al.
+                        [Only NGSI-V2!] Define a location attribute used for the payload by 'name' (The
+                        name of the attribute, e.g.: position), 'lat' (The value for latitude) and 'long'
+                        (The value for longitude). If 'max-lat' and 'max-long' are set, the location
+                        written will be randomly between 'lat' and 'max-lat' and 'long' and 'max-long'
+                        resp. (each including). Note: Multiple location attributes can be defined by
+                        repeating -al.
   -ab name value, --attribute-boolean name value
-                        [Only NGSI!] Define a boolean attribute used for the
-                        payload by 'name' (The name of the attribute, e.g.:
-                        public) and 'value' (One of 'true', 'false' or 'toggle'
-                        [ie. randomly switch between true and false]). Note:
-                        Multiple boolean attributes can be defined by repeating
-                        -ab.
+                        [Only NGSI-V2!] Define a boolean attribute used for the payload by 'name' (The
+                        name of the attribute, e.g.: public) and 'value' (One of 'true', 'false' or
+                        'toggle' [ie. randomly switch between true and false]). Note: Multiple boolean
+                        attributes can be defined by repeating -ab.
   -ai indent, --attribute-indent indent
-                        Define the number of characters for indenting the
-                        created payload. [Default: 0]
-  -r, --dry-run         Do a dry run only - giving the chance to review what
-                        WOULD be done incl. seeing what the payload will look
-                        like.
+                        Define the number of characters for indenting the created payload. [Default: 0]
+  -r, --dry-run         Do a dry run only - giving the chance to review what WOULD be done incl. seeing
+                        what the payload will look like.
   -v, --verbose         Generate verbose output.
   -d from to, --delete from to
-                        If set, the entities within the given range (including
-                        "from" and "to") will be deleted.
+                        If set, the entities within the given range (including "from" and "to") will be
+                        deleted.
 
 Example #1:
-./opensim.py -s my-host.com -b 039ea6d72a2f32227c2110bd8d78aae33acd6782 -t
-curltest
-The id will be increased with every message sent (starting with [first-id]).
-The tenant ['curltest' in the example above] will be used as 'fiware-service' in
-the header of the post.
+./opensim.py -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782' -H Fiware-
+service curltest
+One message is sent using id '1'.
+The tenant 'curltest' will be used as 'Fiware-service' in the header of the post.
 
 Example #2:
-The payload that will be sent will be constructed from the -y and the -aX
-parameters. Example:
-./opensim.py -y WeatherObserved -an temperature,f,-20,50 -an
-precipitation,i,1,20 ...
+./opensim.py -s my-host.com -n 2 -m 50 ...
+100 messages will be sent (2 threads are sending 50 messages each).The id will be looped from '1' to
+'100'.
+
+Example #3:
+./opensim.py -s my-host.com -n 5 -m 100 -f 123 -c ...
+500 messages will be sent (5 threads are sending 100 messages each).The id '123' (-f is first id) will be
+used for all messages (-c is static id).
+
+Example #4:
+The payload that will be sent is constructed from the -y and the -aX parameters. Example:
+./opensim.py -y WeatherObserved -an temperature,f,-20,50 -an precipitation,i,1,20 ...
 will generate a payload looking like:
 {
   "id":"1",
@@ -155,20 +131,20 @@ will generate a payload looking like:
   },
 }
 
-Example #3:
-./opensim.py -d 100 200 -s my-host.com -b
-039ea6d72a2f32227c2110bd8d78aae33acd6782
+Example #5:
+./opensim.py -d 100 200 -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782'
 
 This will delete all IDs starting from 100 to 200 (inclusive).
 ```
 ## Why Not Simply Use "curl" or "Postman/Newman"?
 While it's easy to think about a shell script, that runs curl in a loop adding data via the backend's REST-Api, one important drawback is, that if your server is TLS-secured ('https://...), curl isn't able to cache that TLS-handshake. That means, that EVERY call will do this handshake ending up in response times like one or more seconds. It's hard to generate load this way with hundreds of messages per second. Putting more than one URL in a single curl is a solution for this, but it's hard to aggregate the results and what, if there is more logic needed (e.g. Call this URL after that URL, but only if the first call gave you an 404...)  
 
-Postman is a nice "alternative" for curl - not only because of its nice UI and tons of useful features. Beside all of that, it is able to run in a batch mode (together with Newman) AND it caches TLS-handshakes as well! But still it's hard to generate load, since Postman is resource consuming and when you run more than one instance simultaneously, you'll soon find out your test-machine is the bottleneck. 
+Postman is a nice "alternative" for curl - not only because of its nice UI and tons of useful features. Beside all of that, it is able to run in a batch mode (together with Newman), AND it caches TLS-handshakes as well! But still it's hard to generate load, since Postman is resource consuming and when you run more than one instance simultaneously, you'll soon find out your test-machine is the bottleneck. 
 
 # Supported Backends
 This script is tested with:
 * Orion Context Broker, 2.5.0
+* Orion-LD, post-v0.7 (experimental)
 * FROST-Server, 1.13.0-SNAPSHOT  
 
 Other versions may be compatible, but we do not currently run tests against those.
@@ -189,18 +165,18 @@ Install with: `$ pip install paho-mqtt`
 By running: `pip[3] install -r requirements.txt [--user]` the required libraries can be installed at once.
 
 ## What's that "ID"?
-In Orion Context Broker (NGSI), Contexts are stored as entities, and these entities are referred by their **"id"** (e.g. "urn:ngsi-v2:AirQualityObserved:RZ:Obsv4567"). Such an entity will then have some meta-data and one or more attributes. \
+In Orion Context Broker (NGSI-XX), Contexts are stored as entities, and these entities are referred by their **"id"** (e.g. "urn:ngsi-v2:AirQualityObserved:RZ:Obsv4567"). Such an entity will then have some meta-data and one or more attributes. \
 In FROST (SensorThings), It all starts with a "Thing" that has a **"name"** and an internal (numeric) id. Dependencies (Datastreams, Observations) are related to that internal id that is generated by FROST. \
 opensim.py uses a numeric "id" (starting with simply '1') that can easily be looped. 
 This id is then used as the entity's "id" (Orion) and "name" (FROST) respectively.    
 Please note: This numeric id can be prepended/appended with strings, letting it look more like a "real" entity/thing, if wanted.
 
 ## What is a "Message"?
-A "message" is the attempt, to store a single attribute (SensorThings) or one or more attributes at once (NGSI). For this attempt, one or more calls to the server's API are needed, depending on the type of server (NGSI or ServerThings), the scheme that is used (NGSI), a looping or static id (SensorThings) and even the number of messages and attributes (SensorThings).  
+A "message" is the attempt, to store a single attribute (SensorThings) or one or more attributes at once (NGSI-XX). For this attempt, one or more calls to the server's API are needed, depending on the type of server (NGSI or ServerThings), the scheme that is used (NGSI), a looping or static id (SensorThings) and even the number of messages and attributes (SensorThings).  
 
 | # | Backend | Scheme | Protocol | Static-Id | # of Messages | # of Attributes | API-Access | Summary |   
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |  
-| 1.1 | NGSI | POST-Always | - | yes/no | 1-n | 1-n | 1 POST with 'upsert' | 1 access |  
+| 1.1 | NGSI-XX | POST-Always | - | yes/no | 1-n | 1-n | 1 POST with 'upsert' | 1 access |  
 | 1.2 |  | PATCH/POST | - | yes/no | 1-n | 1-n | 1 PATCH and if not found, 1 POST afterwards (but only once per entity) | 1 access for known entities, <br>2 accesses for new entities |  
 | 2.1 | ServerThings | - | HTTP | yes | 1 | 1 | 1 GET on _Things_ to get the thing-id and if not found, 1 POST on _Things_ to create thing and 1 more GET to get thing-id from _Things_. 1 GET on Datastreams to get datastream-id and if not found, 1 POST on _Datastreams_ to create datastream and 1 more GET to get thing-id from _Datastreams_. 1 POST on _Observations_. | 7 accesses for a new Thing, <br>5 accesses for a known Thing and new Datastream, <br>3 accesses for known Thing and known Datastream |  
 | 2.2 |              | - |      | yes | n | 1 | 1 GET on _Things_ to get the thing-id and if not found, 1 POST on _Things_ to create thing and 1 more GET to get thing-id from _Things_. 1 GET on Datastreams to get datastream-id and if not found, 1 POST on _Datastreams_ to create datastream and 1 more GET to get thing-id from _Datastreams_. 1 POST on _Observations_. | Like 2.1 for the first message, 3 accesses for all others |  
@@ -226,26 +202,35 @@ In short: It depends on the current data-basis. If the entity doesn't exist yet,
 Let's start with the WHERE and WHAT - where do all those message go and what kind of server is that. 
 * **--server _[protocol]host-name_** \
 The server - you are running your test against - will look like _data.my-domain.com_ or maybe _127.0.0.1_. Sometimes you need a special port (_domain.com:9997_) and/or sub-directory (_domain.com:1234/server_). If you omit the protocol, _'https://'_ will be prepended, so if you want to access the server unsecured, your server-parameter will look like _http://domain..._ 
-* **--protocol _NGSI|SensorThings-MQTT|SensorThings-HTTP_** \
-Choose between _NGSI_ (the server is Orion Context Broker) and _SensorThings_ (here you have to choose between _HTTP_ and _MQTT_). If omitted, _NGSI_ is assumed.  
+* **--protocol _NGSI-V2|SensorThings-MQTT|SensorThings-HTTP_** \
+Choose between _NGSI-V2_ (the server is Orion Context Broker, V2) and _SensorThings_ (here you have to choose between _HTTP_ and _MQTT_). If omitted, _NGSI_ is assumed.  
 Please note: Even with _SensorThings-MQTT_, the HTTP-port of FROST will be used for finding out the Thing- and DataStream-id.  
 
-## Define the Authorization (if needed)
-If your server is accessible directly, you can skip these parameters. If the server is behind some API-Management or reverse proxy, you may want to give some authorization within the (Request-) header using the following parameters:
-* **--x-api-key _API-Key_** \
+## Define Headers
+Headers are easily defined by key and value.
+* **--header key value** \
 This will create a Header, that looks like:
   ```
-  'X-Gravitee-Api-Key': 'YOUR-[API-Key]-GOES-HERE'
+  'key':'value'
   ```
-* **--bearer _token_** \
-This will create a Header, that looks like:
-  ```
-  'Authorization': 'Bearer YOUR-[token]-GOES-HERE'
-  ```
+  Examples:
+  ```html
+  --header X-Gravitee-Api-Key YOUR-API-KEY-GOES-HERE
+  Creates header:
+  'X-Gravitee-Api-Key':'YOUR-API-KEY-GOES-HERE'
   
+  --header Authorization "Bearer YOUR-TOKEN-GOES-HERE"
+  Creates header:
+  'Authorization':'Bearer YOUR-TOKEN-GOES-HERE'
+  
+  --header Fiware-service MY_TENANT
+  Creates header:
+  'Fiware-service':'MY_TENANT'
+  ```
+
 ## Define the Scheme to be Used
 * **--insert-always** \
-[NGSI only] Storing Contexts in Orion Context Broker can be done in different ways. Two of them are used here: 
+[NGSI-V2 only] Storing Contexts in Orion Context Broker can be done in different ways. Two of them are used here: 
   * Try to update an Entity by PATCHing the data into a given _id_.  
     If this fails, because the entity does not exist yet, POST the data in order to create new entity. Next time, a PATCH on that _id_ will succeed.  
     The great advantage of this scheme is, that it gives you a "last chance" to perform some action (e.g. you can create a subscription on that _id_) in case, a new entity is introduced to the system.
@@ -276,15 +261,10 @@ When used with _--unlimited_, sets the timeout.
 Limits the sending of messages to the given frequency.
 
 ## Define the Payload
-We are almost ready to send our first message....but what's the use of empty messages without any content? They will probably got tagged "Return to Sender".  
+We are almost ready to send our first message....but what's the use of empty messages without any content? They will probably get tagged "Return to Sender".  
 After a short discussion on how to set up your payload, we will send our first message - I promise!
-* **--tenant _name_** \
-[NGSI only] This tenant will be used in the Request-Header like this:
-  ```html
-   'service-name': 'YOUR-tenant-GOES-HERE'
-  ```
 * **--type _name_** \
-[NGSI only] Type will be stored within the payload and (if set) is the unique identifier (together with the id) of an entity within Orion Context Broker. That means: You can have the same _id_ with different _types_:  
+[NGSI-V2 only] Type will be stored within the payload and (if set) is the unique identifier (together with the id) of an entity within Orion Context Broker. That means: You can have the same _id_ with different _types_:  
   ```json
   {
     "id":"1",
@@ -312,11 +292,11 @@ As with all other attributes: The _name_ of the attribute is stored within the p
 * **--attribute-string _name value_** \
 Simple enough...a string-literal will be stored.
 * **--attribute-date _name_** \
-[NGSI only] Same here: The current Date-Time (local time of the machine, opensim.py is executed on in "ISO 8601"-format) will be stored.
+[NGSI-V2 only] Same here: The current Date-Time (local time of the machine, opensim.py is executed on in 'ISO 8601'-format) will be stored.
 * **--attribute-location _name,lat,long[,max-lat,max-long]_** \
-[NGSI only] Stores a location (in "geo:json"-format). Like with number, setting max-lat and max-long will result in a random location within the given range.
+[NGSI-V2 only] Stores a location (in 'geo:json'-format). Like with number, setting max-lat and max-long will result in a random location within the given range.
 * **--attribute-boolean _name value_** \
-[NGSI only] Nothing interesting here.
+[NGSI-V2 only] Nothing interesting here.
 
 ## Useful
 * **--dry-run** \
