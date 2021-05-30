@@ -181,16 +181,20 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                         # It would be very okay not to use "options=upsert" in this POST, but when
                         # running more than one thread, those POSTs will interfere each other!
                         # The 5th parameter is True in order to use "options=upsert"
-                        # TODO: Orion-LD (currently) does not support upsert at all! As soon as this works, set
-                        # 5th parameter to True again
-                        resp, payload = ngsi.do_post(
-                            session, host, first_id, headers, args.protocol == helper.PROTOCOL_NGSI_V2, args)
+                        # TODO: Orion-LD (currently) does not support upsert at all! As soon as
+                        # this works, set 5th parameter to True again
+                        resp, payload = ngsi.do_post(session,
+                                                     host,
+                                                     first_id,
+                                                     headers,
+                                                     args.protocol == helper.PROTOCOL_NGSI_V2,
+                                                     args)
                         if resp is None:
                             ms = 0
                         else:
                             ms += int(resp.elapsed.total_seconds() * 1000)
-                    # At this point, resp.status_code has to be either 204 (after PATCH) or 201 (after POST)
-                    # in order to be "okay"
+                    # At this point, resp.status_code has to be either 204 (after PATCH)
+                    # or 201 (after POST) in order to be "okay"
                     if resp.status_code == 204 or resp.status_code == 201:
                         okay = True
                     else:

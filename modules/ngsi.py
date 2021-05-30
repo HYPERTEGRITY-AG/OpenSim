@@ -43,7 +43,7 @@ def do_post(session, host, first_id, headers, upsert, args):
 
     try:
         resp = session.post(url, data=payload, headers=headers)
-    except (requests.exceptions.RequestException, Exception) as e:
+    except (requests.exceptions.RequestException, Exception):
         return None, payload
 
     return resp, payload
@@ -81,7 +81,7 @@ def do_patch(session, host, first_id, headers, args):
 
     try:
         resp = session.patch(url, data=payload, headers=headers)
-    except (requests.exceptions.RequestException, Exception) as e:
+    except (requests.exceptions.RequestException, Exception):
         return None, payload
 
     return resp, payload

@@ -588,9 +588,11 @@ def check_arguments(parser, args):
 
         if not args.delete:
             # check scheme?
-            if args.insert_always and (args.protocol != helper.PROTOCOL_NGSI_V2 and args.protocol != helper.PROTOCOL_NGSI_LD):
+            if args.insert_always and (args.protocol != helper.PROTOCOL_NGSI_V2 and
+                                       args.protocol != helper.PROTOCOL_NGSI_LD):
                 parser.error(
-                    "Insert always scheme [-i/--insert-always] is only valid for NGSI-V2 and NGSI-LD!"
+                    "Insert always scheme [-i/--insert-always] is only valid "
+                    "for NGSI-V2 and NGSI-LD!"
                 )
 
             # is there any payload?
