@@ -4,9 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased] - 2021-xx-xx
+This release is about packaging and distributing.
 
-## [1.1.0] - 2021-xx-xx
+### Added
+- Nothing
+
+### Deleted
+- Nothing
+
+### Changed
+- Nothing
+
+## [1.1.0] - 2021-05-30
 This release contains mainly 2 topics:
 * **NGSI-LD Support (experimental)** - Starting with this release the experimental Orion LD-server (Version: post-v0.7) can be used with OpenSim.
 * **Changes in Options** - This release has some changes in options in a way, that there is now a more generic way for creating necessary headers. If you are familiar with the current options (in 1.0.0), here is, how to "migrate" to the new options:
@@ -15,7 +25,7 @@ This release contains mainly 2 topics:
   * **X-Gravitee-Api-Key** - If you used the -x [--x-api-key] option to set an X-Gravitee-Api-Key, please use `-H X-Gravitee-Api-Key MY_API_KEY` now.
 
 ### Added
-- NGSI-LD support.
+- NGSI-LD support (experimental).
 - Option -H [--header] can be used to add header.
 
 ### Deleted

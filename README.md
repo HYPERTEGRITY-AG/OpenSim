@@ -230,7 +230,7 @@ This will create a Header, that looks like:
 
 ## Define the Scheme to be Used
 * **--insert-always** \
-[NGSI-V2 only] Storing Contexts in Orion Context Broker can be done in different ways. Two of them are used here: 
+[NGSI-V2 and NGSI-LD only] Storing Contexts in Orion Context Broker can be done in different ways. Two of them are used here: 
   * Try to update an Entity by PATCHing the data into a given _id_.  
     If this fails, because the entity does not exist yet, POST the data in order to create new entity. Next time, a PATCH on that _id_ will succeed.  
     The great advantage of this scheme is, that it gives you a "last chance" to perform some action (e.g. you can create a subscription on that _id_) in case, a new entity is introduced to the system.
@@ -264,7 +264,7 @@ Limits the sending of messages to the given frequency.
 We are almost ready to send our first message....but what's the use of empty messages without any content? They will probably get tagged "Return to Sender".  
 After a short discussion on how to set up your payload, we will send our first message - I promise!
 * **--type _name_** \
-[NGSI-V2 only] Type will be stored within the payload and (if set) is the unique identifier (together with the id) of an entity within Orion Context Broker. That means: You can have the same _id_ with different _types_:  
+[NGSI-V2 and NGSI-LD only] Type will be stored within the payload and (if set) is the unique identifier (together with the id) of an entity within Orion Context Broker. That means: You can have the same _id_ with different _types_:  
   ```json
   {
     "id":"1",
