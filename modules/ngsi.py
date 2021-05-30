@@ -37,6 +37,8 @@ def do_post(session, host, first_id, headers, upsert, args):
         payload = helper.create_payload_ngsi_v2(first_id, True, args)
     else:
         url = host + LD_ENTITIES
+        if upsert:
+            url += OPTIONS_UPSERT
         payload = helper.create_payload_ngsi_ld(first_id, args, True)
 
     try:
@@ -56,7 +58,7 @@ def do_patch(session, host, first_id, headers, args):
                                    args.prefix,
                                    args.postfix,
                                    0,
-                                   args.protocol == helper.PROTOCOL_NGSI_LD)
+                                   False)
                 + ATTRS
         )
         if args.type is not None:
@@ -72,7 +74,7 @@ def do_patch(session, host, first_id, headers, args):
                                    args.prefix,
                                    args.postfix,
                                    0,
-                                   args.protocol == helper.PROTOCOL_NGSI_LD)
+                                   True)
                 + ATTRS
         )
         payload = helper.create_payload_ngsi_ld(None, args, False)

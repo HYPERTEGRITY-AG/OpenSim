@@ -151,8 +151,11 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
         if halt:
             return
 
-        if args.protocol == helper.PROTOCOL_NGSI_V2:
-            headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
+        if args.protocol == helper.PROTOCOL_NGSI_V2 or args.protocol == helper.PROTOCOL_NGSI_LD:
+            if args.protocol == helper.PROTOCOL_NGSI_V2:
+                headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
+            else:
+                headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON_LD}
 
             if args.headers is not None:
                 headers.update(args.headers)
@@ -166,7 +169,7 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     okay = False
                 else:
                     ms = int(resp.elapsed.total_seconds() * 1000)
-                    okay = resp.status_code == 204
+                    okay = resp.status_code == 204 or resp.status_code == 201
             else:
                 resp, payload = ngsi.do_patch(session, host, first_id, headers, args)
                 if resp is None:
@@ -178,13 +181,17 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                         # It would be very okay not to use "options=upsert" in this POST, but when
                         # running more than one thread, those POSTs will interfere each other!
                         # The 5th parameter is True in order to use "options=upsert"
+                        # TODO: Orion-LD (currently) does not support upsert at all! As soon as this works, set
+                        # 5th parameter to True again
                         resp, payload = ngsi.do_post(
-                            session, host, first_id, headers, True, args)
+                            session, host, first_id, headers, args.protocol == helper.PROTOCOL_NGSI_V2, args)
                         if resp is None:
                             ms = 0
                         else:
                             ms += int(resp.elapsed.total_seconds() * 1000)
-                    if resp.status_code == 204:
+                    # At this point, resp.status_code has to be either 204 (after PATCH) or 201 (after POST)
+                    # in order to be "okay"
+                    if resp.status_code == 204 or resp.status_code == 201:
                         okay = True
                     else:
                         okay = False
@@ -198,7 +205,7 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                         error_as_string = (
                             str(resp.status_code)
                             + " "
-                            + " ".join(resp.text.split())[0:120]
+                            + " ".join(resp.text.split())[0:160]
                         )
 
                     if error_as_string in unique_errors.keys():
@@ -225,92 +232,6 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                         # There is this funny thing that Orion sometimes tells
                         # us about 400 ParseError
                         # see https://github.com/telefonicaid/fiware-orion/issues/3731
-                        if resp.status_code == 400:
-                            message += "\nPayload was:\n" + payload
-
-                            # try to resend
-                            # if insert_always:
-                            #     url = host + "/v2/entities/?options=upsert"
-                            #
-                            #     resp = session.post(url, data=payload, headers=headers)
-
-                            # In 100%, resending exactly the same payload again gives a 201
-
-                        print(
-                            "%s  %3i  %4i %s"
-                            % (
-                                helper.create_id(first_id,
-                                                 args.prefix,
-                                                 args.postfix,
-                                                 max_id_length,
-                                                 args.protocol == helper.PROTOCOL_NGSI_LD),
-                                resp.status_code,
-                                ms,
-                                message,
-                            )
-                        )
-        elif args.protocol == helper.PROTOCOL_NGSI_LD:
-            # since there is no "?options=upsert" in LD, we have always patch/post scheme
-            headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON_LD}
-
-            if args.headers is not None:
-                headers.update(args.headers)
-
-            # since there is no "?options=upsert" in LD, we have always patch/post scheme
-            resp, payload = ngsi.do_patch(session, host, first_id, headers, args)
-            if resp is None:
-                ms = 0
-                okay = False
-            else:
-                ms = int(resp.elapsed.total_seconds() * 1000)
-                if resp.status_code == 404:
-                    resp, payload = ngsi.do_post(
-                        session, host, first_id, headers, False, args
-                    )
-                    if resp is None:
-                        ms = 0
-                        okay = False
-                    else:
-                        ms += int(resp.elapsed.total_seconds() * 1000)
-                        okay = resp.status_code == 201
-                else:
-                    okay = True
-
-            with lock:
-                if not okay:
-                    errors += 1
-                    if resp is None:
-                        error_as_string = "Connection Error"
-                    else:
-                        error_as_string = (
-                            str(resp.status_code)
-                            + " "
-                            + " ".join(resp.text.split())[0:120]
-                        )
-
-                    if error_as_string in unique_errors.keys():
-                        num = unique_errors[error_as_string]
-                        unique_errors[error_as_string] = num + 1
-                    else:
-                        unique_errors[error_as_string] = 1
-
-                overall_time += ms
-                overall_messages += 1
-
-                if args.verbose:
-                    if resp is None:
-                        print(
-                            "%s  ???  ---- Connection Error!"
-                            % helper.create_id(first_id,
-                                               args.prefix,
-                                               args.postfix,
-                                               max_id_length,
-                                               args.protocol == helper.PROTOCOL_NGSI_LD)
-                        )
-                    else:
-                        message = " ".join(resp.text.split())[0:120]
-                        # There is this funny thing that Orion sometimes tells
-                        # us about 400 ParseError
                         if resp.status_code == 400:
                             message += "\nPayload was:\n" + payload
 

@@ -43,9 +43,9 @@ def parse_arguments():
 
     parser.epilog = (
         "Example #1:|n"
-        "./opensim.py -s my-host.com -x Authorization "
+        "./opensim.py -s my-host.com -H Authorization "
         "'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782' "
-        "-x Fiware-service curltest|n"
+        "-H Fiware-service curltest|n"
         "One message is sent using id '1'.|n"
         "The tenant 'curltest' will be used "
         "as 'Fiware-service' in the "
@@ -90,7 +90,7 @@ def parse_arguments():
     parser.epilog += (
         "|n|nExample #5:|n"
         "./opensim.py -d 100 200 -s my-host.com "
-        "-x Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782'|n"
+        "-H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782'|n"
         "|n"
         "This will delete all IDs starting from 100 to 200 (inclusive)."
     )
@@ -128,10 +128,9 @@ def parse_arguments():
         dest="insert_always",
         action="store_true",
         default=False,
-        help="[Only NGSI-V2!] If set, the contexts will always be inserted "
+        help="[Only NGSI-V2 and NGSI-LD!] If set, the contexts will always be inserted "
         "(via POST with option 'upsert') instead "
-        "of trying to update first (via PATCH) and insert (via POST w/o "
-        "option 'upsert'), if not "
+        "of trying to update first (via PATCH) and insert (via POST), if not "
         "existing (i.e. PATCH returns '404 Not Found').",
     )
 
@@ -148,7 +147,7 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "-x",
+        "-H",
         "--header",
         metavar=("key", "value"),
         dest="headers",
@@ -589,9 +588,9 @@ def check_arguments(parser, args):
 
         if not args.delete:
             # check scheme?
-            if args.insert_always and args.protocol != helper.PROTOCOL_NGSI_V2:
+            if args.insert_always and (args.protocol != helper.PROTOCOL_NGSI_V2 and args.protocol != helper.PROTOCOL_NGSI_LD):
                 parser.error(
-                    "Insert always scheme [-i/--insert-always] is only valid for NGSI-V2!"
+                    "Insert always scheme [-i/--insert-always] is only valid for NGSI-V2 and NGSI-LD!"
                 )
 
             # is there any payload?

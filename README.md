@@ -171,7 +171,7 @@ Postman is a nice "alternative" for curl - not only because of its nice UI and t
 # Supported Backends
 This script is tested with:
 * Orion Context Broker, 2.5.0
-* Orion-LD, alpha-0.4.0 
+* Orion-LD, post-v0.7 (experimental)
 * FROST-Server, 1.13.0-SNAPSHOT  
 
 Other versions may be compatible, but we do not currently run tests against those.
