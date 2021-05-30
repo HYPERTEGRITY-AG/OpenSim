@@ -175,14 +175,16 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                 else:
                     ms = int(resp.elapsed.total_seconds() * 1000)
                     if resp.status_code == 404:
+                        # It would be very okay not to use "options=upsert" in this POST, but when
+                        # running more than one thread, those POSTs will interfere each other!
+                        # The 5th parameter is True in order to use "options=upsert"
                         resp, payload = ngsi.do_post(
                             session, host, first_id, headers, True, args)
                         if resp is None:
                             ms = 0
                         else:
                             ms += int(resp.elapsed.total_seconds() * 1000)
-                    #  TODO: Check this!
-                    if resp.status_code == 204 or resp.status_code == 201:
+                    if resp.status_code == 204:
                         okay = True
                     else:
                         okay = False
