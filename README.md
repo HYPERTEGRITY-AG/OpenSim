@@ -16,97 +16,114 @@ $ ./opensim.py -s http://myserver.com -p NGSI-V2 -ad dateObserved -an temperatur
 And if you don't want to read this documentation at all: Remember that you can use --help at any time! :-)
 ```commandline
 $ ./opensim.py -h
-usage: opensim.py [-h] -s [protocol]host-name [-p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}] [-i]
-                  [-a id] [-H key value] [-f id] [-e PREFIX] [-o POSTFIX] [-c] [-n num] [-m num] [-u]
-                  [-q milliseconds] [-l seconds] [-y name] [-an name,type,number[,max-number]] [-as name value]
-                  [-ad name] [-al name,lat,long[,max-lat,max-long]] [-ab name value] [-ai indent] [-r] [-v]
-                  [-d from to]
+opensim.py, Copyright (c) 2021 Will Freitag, Version 1.1.0
+usage: opensim.py [-h] -s
+                  [protocol]host-name [-p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}]
+                  [-i] [-a id] [-H key value] [-f id] [-e PREFIX] [-o POSTFIX] [-c] [-n num]
+                  [-m num] [-u] [-q milliseconds] [-l seconds] [-y name]
+                  [-an name,type,number[,max-number]] [-as name value] [-ad name]
+                  [-al name,lat,long[,max-lat,max-long]] [-ab name value] [-ai indent] [-r]
+                  [-v] [-d from to]
 
 Tool to create some load on Orion Context Broker/FROST-Server.
 
 optional arguments:
   -h, --help            show this help message and exit
   -s [protocol]host-name, --server [protocol]host-name
-                        This host-name will be prepended by "https://", if protocol is omitted and appended with
-                        "/v2/" (NGSI-V2), "/ngsi-ld/v1" (NGSI-LD) or "/v1.1/" (SensorThings) resp. depending on
-                        the server-type (see -p/--protocol).
+                        This host-name will be prepended by "https://", if protocol is omitted
+                        and appended with "/v2/" (NGSI-V2), "/ngsi-ld/v1" (NGSI-LD) or
+                        "/v1.1/" (SensorThings) resp. depending on the server-type (see
+                        -p/--protocol).
   -p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}, --protocol {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}
                         Define the type of server. [Default: NGSI-V2]
-  -i, --insert-always   [Only NGSI-V2 and NGSI-LD!] If set, the contexts will always be inserted (via POST with
-                        option 'upsert') instead of trying to update first (via PATCH) and insert (via POST), if
-                        not existing (i.e. PATCH returns '404 Not Found').
+  -i, --insert-always   [Only NGSI-V2 and NGSI-LD!] If set, the contexts will always be
+                        inserted (via POST with option 'upsert') instead of trying to update
+                        first (via PATCH) and insert (via POST), if not existing (i.e. PATCH
+                        returns '404 Not Found').
   -a id, --datastream-id id
-                        [Only SensorThings!] If set, this Datastream-Id will be used for ALL Observations, instead
-                        of first searching for the Thing by it's name and the correct Datastream-Id afterwards.
+                        [Only SensorThings!] If set, this Datastream-Id will be used for ALL
+                        Observations, instead of first searching for the Thing by it's name
+                        and the correct Datastream-Id afterwards.
   -H key value, --header key value
                         Define a header by key and value.
-  -f id, --first-id id  Define the first id to be used or the one to be used if '-c/--static-id' is set. [Default:
-                        1]
+  -f id, --first-id id  Define the first id to be used or the one to be used if '-c/--static-
+                        id' is set. [Default: 1]
   -e PREFIX, --prefix PREFIX
                         If set, the prefix will be prepended to the generated id.
   -o POSTFIX, --postfix POSTFIX
                         If set, the postfix will be appended to the generated id.
-  -c, --static-id       If set, the id will not increment (i.e. -n times -m messages will be sent with the same id
-                        ['-f/--first-id' or '1' if omitted]).
+  -c, --static-id       If set, the id will not increment (i.e. -n times -m messages will be
+                        sent with the same id ['-f/--first-id' or '1' if omitted]).
   -n num, --num-threads num
                         Define, how many threads shall be used. [Default: 1]
   -m num, --messages num
-                        Define, how many messages per thread shall be sent (ignored, if '-u/--unlimited' ist set).
-                        [Default: 1]
-  -u, --unlimited       If set, '-m/--messages' is ignored and infinite messages will be send (in '-n/--num-
-                        threads' threads). Hit 'Ctrl-C' to interrupt or set '-l/--limit-time'.
+                        Define, how many messages per thread shall be sent (ignored, if
+                        '-u/--unlimited' ist set). [Default: 1]
+  -u, --unlimited       If set, '-m/--messages' is ignored and infinite messages will be send
+                        (in '-n/--num-threads' threads). Hit 'Ctrl-C' to interrupt or set
+                        '-l/--limit-time'.
   -q milliseconds, --frequency milliseconds
-                        If set, limits the frequency of the messages sent to the given number (per thread!).
+                        If set, limits the frequency of the messages sent to the given number
+                        (per thread!).
   -l seconds, --limit-time seconds
-                        Only in conjunction with '-u/--unlimited': Stops after the given time in seconds.
-  -y name, --type name  [Only NGSI-V2 and NGSI-LD!] If set, this type-name will be used in the payload.
+                        Only in conjunction with '-u/--unlimited': Stops after the given time
+                        in seconds.
+  -y name, --type name  [Only NGSI-V2 and NGSI-LD!] If set, this type-name will be used in the
+                        payload.
   -an name,type,number[,max-number], --attribute-number name,type,number[,max-number]
-                        Define a number attribute used for the payload by 'name' (The name of the attribute, e.g.:
-                        temperature), 'type' (One of i [integer] or f [floating point])and 'number' (The value to
-                        be used). If 'max-number' is set, the number written will be randomly between 'number' and
-                        'max-number' (each including). Note: Multiple number attributes can be defined by
-                        repeating -an.
+                        Define a number attribute used for the payload by 'name' (The name of
+                        the attribute, e.g.: temperature), 'type' (One of i [integer] or f
+                        [floating point])and 'number' (The value to be used). If 'max-number'
+                        is set, the number written will be randomly between 'number' and 'max-
+                        number' (each including). Note: Multiple number attributes can be
+                        defined by repeating -an.
   -as name value, --attribute-string name value
-                        Define a string attribute used for the payload by 'name' (The name of the attribute, e.g.:
-                        instruction) and 'value' (the actual string). Note: Multiple string attributes can be
-                        defined by repeating -as.
+                        Define a string attribute used for the payload by 'name' (The name of
+                        the attribute, e.g.: instruction) and 'value' (the actual string).
+                        Note: Multiple string attributes can be defined by repeating -as.
   -ad name, --attribute-date name
-                        [Only NGSI-V2!] Define a DateTime attribute used for the payload by 'name' (The name of
-                        the attribute, e.g.: dateObserved). Note: The current time is used as value. Multiple
-                        DateTime attributes can be defined by repeating -ad.
+                        [Only NGSI-V2!] Define a DateTime attribute used for the payload by
+                        'name' (The name of the attribute, e.g.: dateObserved). Note: The
+                        current time is used as value. Multiple DateTime attributes can be
+                        defined by repeating -ad.
   -al name,lat,long[,max-lat,max-long], --attribute-location name,lat,long[,max-lat,max-long]
-                        [Only NGSI-V2!] Define a location attribute used for the payload by 'name' (The name of
-                        the attribute, e.g.: position), 'lat' (The value for latitude) and 'long' (The value for
-                        longitude). If 'max-lat' and 'max-long' are set, the location written will be randomly
-                        between 'lat' and 'max-lat' and 'long' and 'max-long' resp. (each including). Note:
-                        Multiple location attributes can be defined by repeating -al.
+                        [Only NGSI-V2!] Define a location attribute used for the payload by
+                        'name' (The name of the attribute, e.g.: position), 'lat' (The value
+                        for latitude) and 'long' (The value for longitude). If 'max-lat' and
+                        'max-long' are set, the location written will be randomly between
+                        'lat' and 'max-lat' and 'long' and 'max-long' resp. (each including).
+                        Note: Multiple location attributes can be defined by repeating -al.
   -ab name value, --attribute-boolean name value
-                        [Only NGSI-V2!] Define a boolean attribute used for the payload by 'name' (The name of the
-                        attribute, e.g.: public) and 'value' (One of 'true', 'false' or 'toggle' [ie. randomly
-                        switch between true and false]). Note: Multiple boolean attributes can be defined by
-                        repeating -ab.
+                        [Only NGSI-V2!] Define a boolean attribute used for the payload by
+                        'name' (The name of the attribute, e.g.: public) and 'value' (One of
+                        'true', 'false' or 'toggle' [ie. randomly switch between true and
+                        false]). Note: Multiple boolean attributes can be defined by repeating
+                        -ab.
   -ai indent, --attribute-indent indent
-                        Define the number of characters for indenting the created payload. [Default: 0]
-  -r, --dry-run         Do a dry run only - giving the chance to review what WOULD be done incl. seeing what the
-                        payload will look like.
+                        Define the number of characters for indenting the created payload.
+                        [Default: 0]
+  -r, --dry-run         Do a dry run only - giving the chance to review what WOULD be done
+                        incl. seeing what the payload will look like.
   -v, --verbose         Generate verbose output.
   -d from to, --delete from to
-                        If set, the entities within the given range (including "from" and "to") will be deleted.
+                        If set, the entities within the given range (including "from" and
+                        "to") will be deleted.
 
 Example #1:
-./opensim.py -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782' -H Fiware-service
-curltest
+./opensim.py -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782'
+-H Fiware-service curltest
 One message is sent using id '1'.
 The tenant 'curltest' will be used as 'Fiware-service' in the header of the post.
 
 Example #2:
 ./opensim.py -s my-host.com -n 2 -m 50 ...
-100 messages will be sent (2 threads are sending 50 messages each).The id will be looped from '1' to '100'.
+100 messages will be sent (2 threads are sending 50 messages each).The id will be looped from
+'1' to '100'.
 
 Example #3:
 ./opensim.py -s my-host.com -n 5 -m 100 -f 123 -c ...
-500 messages will be sent (5 threads are sending 100 messages each).The id '123' (-f is first id) will be used for
-all messages (-c is static id).
+500 messages will be sent (5 threads are sending 100 messages each).The id '123' (-f is first
+id) will be used for all messages (-c is static id).
 
 Example #4:
 The payload that will be sent is constructed from the -y and the -aX parameters. Example:
@@ -126,7 +143,8 @@ will generate a payload looking like:
 }
 
 Example #5:
-./opensim.py -d 100 200 -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782'
+./opensim.py -d 100 200 -s my-host.com -H Authorization 'Bearer
+039ea6d72a2f32227c2110bd8d78aae33acd6782'
 
 This will delete all IDs starting from 100 to 200 (inclusive).
 ```
