@@ -101,10 +101,10 @@ def parse_arguments():
         metavar="[protocol]host-name",
         dest="server",
         help='This host-name will be prepended by "https://", if protocol '
-        'is omitted and appended '
+        "is omitted and appended "
         'with "/v2/" (NGSI-V2), "/ngsi-ld/v1" '
         '(NGSI-LD) or "/v1.1/" (SensorThings) resp. '
-        'depending on the server-type (see -p/--protocol).',
+        "depending on the server-type (see -p/--protocol).",
         required=True,
     )
 
@@ -588,15 +588,20 @@ def check_arguments(parser, args):
 
         if not args.delete:
             # check scheme?
-            if args.insert_always and (args.protocol != helper.PROTOCOL_NGSI_V2 and
-                                       args.protocol != helper.PROTOCOL_NGSI_LD):
+            if args.insert_always and (
+                args.protocol != helper.PROTOCOL_NGSI_V2
+                and args.protocol != helper.PROTOCOL_NGSI_LD
+            ):
                 parser.error(
                     "Insert always scheme [-i/--insert-always] is only valid "
                     "for NGSI-V2 and NGSI-LD!"
                 )
 
             # is there any payload?
-            if args.protocol == helper.PROTOCOL_NGSI_V2 or args.protocol != helper.PROTOCOL_NGSI_LD:
+            if (
+                args.protocol == helper.PROTOCOL_NGSI_V2
+                or args.protocol != helper.PROTOCOL_NGSI_LD
+            ):
                 if (
                     ((args.numbers is None) or (len(args.numbers) == 0))
                     and ((args.booleans is None) or (len(args.booleans) == 0))

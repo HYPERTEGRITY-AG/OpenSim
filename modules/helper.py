@@ -143,11 +143,13 @@ def create_payload_ngsi_v2(first_id, meta_data, args):
     payload = dict()
     if meta_data:
         if first_id is not None:
-            payload["id"] = create_id(first_id,
-                                      args.prefix,
-                                      args.postfix,
-                                      0,
-                                      args.protocol == PROTOCOL_NGSI_LD)
+            payload["id"] = create_id(
+                first_id,
+                args.prefix,
+                args.postfix,
+                0,
+                args.protocol == PROTOCOL_NGSI_LD,
+            )
         if args.type is not None:
             payload["type"] = args.type
 
@@ -226,26 +228,28 @@ def create_payload_ngsi_ld(first_id, args, is_post):
 
     if first_id is not None:
         context = {
-            "id": create_id(first_id,
-                            args.prefix,
-                            args.postfix,
-                            0,
-                            args.protocol == PROTOCOL_NGSI_LD),
-            "type": args.type
+            "id": create_id(
+                first_id,
+                args.prefix,
+                args.postfix,
+                0,
+                args.protocol == PROTOCOL_NGSI_LD,
+            ),
+            "type": args.type,
         }
     else:
-        context = {
-            "type": args.type
-        }
+        context = {"type": args.type}
     payload["@context"] = context
 
     if is_post:
         if first_id is not None:
-            payload["id"] = create_id(first_id,
-                                      args.prefix,
-                                      args.postfix,
-                                      0,
-                                      args.protocol == PROTOCOL_NGSI_LD)
+            payload["id"] = create_id(
+                first_id,
+                args.prefix,
+                args.postfix,
+                0,
+                args.protocol == PROTOCOL_NGSI_LD,
+            )
         payload["type"] = args.type
 
     if args.date_times is not None:
