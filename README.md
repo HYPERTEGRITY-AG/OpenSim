@@ -1,3 +1,5 @@
+[![HitCount](http://hits.dwyl.com/HYPERTEGRITY-AG/OpenSim.svg)](http://hits.dwyl.com/HYPERTEGRITY-AG/OpenSim)
+
 # Open Smart City - Sim
 
 Copyright (c) 2021 Will Freitag, Version: 1.1.0
