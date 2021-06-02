@@ -1,3 +1,5 @@
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/HYPERTEGRITY-AG/OpenSim/all-lints)
+
 # Open Smart City - Sim
 
 Copyright (c) 2021 Will Freitag, Version: 1.1.0
