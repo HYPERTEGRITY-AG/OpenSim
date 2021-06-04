@@ -43,7 +43,7 @@ def parse_arguments():
 
     parser.epilog = (
         "Example #1:|n"
-        "./opensim.py -s my-host.com -H Authorization "
+        "opensim -s my-host.com -H Authorization "
         "'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782' "
         "-H Fiware-service curltest|n"
         "One message is sent using id '1'.|n"
@@ -54,14 +54,14 @@ def parse_arguments():
 
     parser.epilog += (
         "|n|nExample #2:|n"
-        "./opensim.py -s my-host.com -n 2 -m 50 ...|n"
+        "opensim -s my-host.com -n 2 -m 50 ...|n"
         "100 messages will be sent (2 threads are sending 50 messages each)."
         "The id will be looped from '1' to '100'.|n"
     )
 
     parser.epilog += (
         "|n|nExample #3:|n"
-        "./opensim.py -s my-host.com -n 5 -m 100 -f 123 -c ...|n"
+        "opensim -s my-host.com -n 5 -m 100 -f 123 -c ...|n"
         "500 messages will be sent (5 threads are sending 100 messages each)."
         "The id '123' (-f is first id) will be used for all messages (-c is static id).|n"
     )
@@ -70,7 +70,7 @@ def parse_arguments():
         "|n|nExample #4:|n"
         "The payload that will be sent is constructed from the -y and "
         "the -aX parameters. Example:|n"
-        "./opensim.py -y WeatherObserved -an temperature,f,-20,50 "
+        "opensim -y WeatherObserved -an temperature,f,-20,50 "
         "-an precipitation,i,1,20 ...|n"
         "will generate a payload looking like:|n"
         "{|n"
@@ -89,7 +89,7 @@ def parse_arguments():
 
     parser.epilog += (
         "|n|nExample #5:|n"
-        "./opensim.py -d 100 200 -s my-host.com "
+        "opensim -d 100 200 -s my-host.com "
         "-H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782'|n"
         "|n"
         "This will delete all IDs starting from 100 to 200 (inclusive)."

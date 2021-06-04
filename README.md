@@ -5,43 +5,43 @@
 Copyright (c) 2021 Will Freitag, Version: 1.1.0
 
 ## TL;DR
-_opensim.py_ is a lightweight tool to send test data to an Orion Context Broker or FROST-Server respectively. \
+_OpenSim_ is a lightweight tool to send test data to an Orion Context Broker or FROST-Server respectively. \
 It can be used to send just a single message to test your installation and also to send thousands of messages in multiple threads in order to stress your installation. \
 Creation of test-data w/o integrating any sensors is another aspect that can be handled with this tool. \
 For this to end, not the complete APIs of both, Orion and FROST are implemented (it's not an Orion- or FROST-Client!), but the API needed to send Data (Contexts and Things/Datastreams/Observations resp.) is in place.  
 
 A simple call of this tool like...
 ```commandline
-$ ./opensim.py -s http://myserver.com -p NGSI-V2 -ad dateObserved -an temperature,f,20.5
+$ opensim -s http://myserver.com -p NGSI-V2 -ad dateObserved -an temperature,f,20.5
 ```
 ...will send one context to an Orion Context Broker at myserver.com with a payload defining a weather observation (date and temperature).  
 And if you don't want to read this documentation at all: Remember that you can use --help at any time! :-)
 ```commandline
-$ ./opensim.py -h
-opensim.py, Copyright (c) 2021 Will Freitag, Version 1.1.0
-usage: opensim.py [-h] -s [protocol]host-name [-p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}]
-                  [-i] [-a id] [-H key value] [-f id] [-e PREFIX] [-o POSTFIX] [-c] [-n num] [-m num] [-u]
-                  [-q milliseconds] [-l seconds] [-y name] [-an name,type,number[,max-number]]
-                  [-as name value] [-ad name] [-al name,lat,long[,max-lat,max-long]] [-ab name value]
-                  [-ai indent] [-r] [-v] [-d from to]
+$ opensim -h
+OpenSim, Copyright (c) 2021 Will Freitag, Version 1.1.1
+usage: opensim [-h] -s [protocol]host-name [-p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}] [-i]
+               [-a id] [-H key value] [-f id] [-e PREFIX] [-o POSTFIX] [-c] [-n num] [-m num] [-u]
+               [-q milliseconds] [-l seconds] [-y name] [-an name,type,number[,max-number]] [-as name value]
+               [-ad name] [-al name,lat,long[,max-lat,max-long]] [-ab name value] [-ai indent] [-r] [-v]
+               [-d from to]
 
 Tool to create some load on Orion Context Broker/FROST-Server.
 
 optional arguments:
   -h, --help            show this help message and exit
   -s [protocol]host-name, --server [protocol]host-name
-                        This host-name will be prepended by "https://", if protocol is omitted and
-                        appended with "/v2/" (NGSI-V2), "/ngsi-ld/v1" (NGSI-LD) or "/v1.1/" (SensorThings)
-                        resp. depending on the server-type (see -p/--protocol).
+                        This host-name will be prepended by "https://", if protocol is omitted and appended with
+                        "/v2/" (NGSI-V2), "/ngsi-ld/v1" (NGSI-LD) or "/v1.1/" (SensorThings) resp. depending on
+                        the server-type (see -p/--protocol).
   -p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}, --protocol {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}
                         Define the type of server. [Default: NGSI-V2]
-  -i, --insert-always   [Only NGSI-V2 and NGSI-LD!] If set, the contexts will always be inserted (via POST
-                        with option 'upsert') instead of trying to update first (via PATCH) and insert
-                        (via POST), if not existing (i.e. PATCH returns '404 Not Found').
+  -i, --insert-always   [Only NGSI-V2 and NGSI-LD!] If set, the contexts will always be inserted (via POST with
+                        option 'upsert') instead of trying to update first (via PATCH) and insert (via POST), if
+                        not existing (i.e. PATCH returns '404 Not Found').
   -a id, --datastream-id id
                         [Only SensorThings!] If set, this Datastream-Id will be used for ALL Observations,
-                        instead of first searching for the Thing by it's name and the correct Datastream-
-                        Id afterwards.
+                        instead of first searching for the Thing by it's name and the correct Datastream-Id
+                        afterwards.
   -H key value, --header key value
                         Define a header by key and value.
   -f id, --first-id id  Define the first id to be used or the one to be used if '-c/--static-id' is set.
@@ -50,75 +50,71 @@ optional arguments:
                         If set, the prefix will be prepended to the generated id.
   -o POSTFIX, --postfix POSTFIX
                         If set, the postfix will be appended to the generated id.
-  -c, --static-id       If set, the id will not increment (i.e. -n times -m messages will be sent with the
-                        same id ['-f/--first-id' or '1' if omitted]).
+  -c, --static-id       If set, the id will not increment (i.e. -n times -m messages will be sent with the same
+                        id ['-f/--first-id' or '1' if omitted]).
   -n num, --num-threads num
                         Define, how many threads shall be used. [Default: 1]
   -m num, --messages num
-                        Define, how many messages per thread shall be sent (ignored, if '-u/--unlimited'
-                        ist set). [Default: 1]
-  -u, --unlimited       If set, '-m/--messages' is ignored and infinite messages will be send (in
-                        '-n/--num-threads' threads). Hit 'Ctrl-C' to interrupt or set '-l/--limit-time'.
+                        Define, how many messages per thread shall be sent (ignored, if '-u/--unlimited' ist
+                        set). [Default: 1]
+  -u, --unlimited       If set, '-m/--messages' is ignored and infinite messages will be send (in '-n/--num-
+                        threads' threads). Hit 'Ctrl-C' to interrupt or set '-l/--limit-time'.
   -q milliseconds, --frequency milliseconds
-                        If set, limits the frequency of the messages sent to the given number (per
-                        thread!).
+                        If set, limits the frequency of the messages sent to the given number (per thread!).
   -l seconds, --limit-time seconds
                         Only in conjunction with '-u/--unlimited': Stops after the given time in seconds.
   -y name, --type name  [Only NGSI-V2 and NGSI-LD!] If set, this type-name will be used in the payload.
   -an name,type,number[,max-number], --attribute-number name,type,number[,max-number]
-                        Define a number attribute used for the payload by 'name' (The name of the
-                        attribute, e.g.: temperature), 'type' (One of i [integer] or f [floating
-                        point])and 'number' (The value to be used). If 'max-number' is set, the number
-                        written will be randomly between 'number' and 'max-number' (each including). Note:
-                        Multiple number attributes can be defined by repeating -an.
+                        Define a number attribute used for the payload by 'name' (The name of the attribute,
+                        e.g.: temperature), 'type' (One of i [integer] or f [floating point])and 'number' (The
+                        value to be used). If 'max-number' is set, the number written will be randomly between
+                        'number' and 'max-number' (each including). Note: Multiple number attributes can be
+                        defined by repeating -an.
   -as name value, --attribute-string name value
-                        Define a string attribute used for the payload by 'name' (The name of the
-                        attribute, e.g.: instruction) and 'value' (the actual string). Note: Multiple
-                        string attributes can be defined by repeating -as.
+                        Define a string attribute used for the payload by 'name' (The name of the attribute,
+                        e.g.: instruction) and 'value' (the actual string). Note: Multiple string attributes can
+                        be defined by repeating -as.
   -ad name, --attribute-date name
-                        [Only NGSI-V2!] Define a DateTime attribute used for the payload by 'name' (The
-                        name of the attribute, e.g.: dateObserved). Note: The current time is used as
-                        value. Multiple DateTime attributes can be defined by repeating -ad.
+                        [Only NGSI-V2!] Define a DateTime attribute used for the payload by 'name' (The name of
+                        the attribute, e.g.: dateObserved). Note: The current time is used as value. Multiple
+                        DateTime attributes can be defined by repeating -ad.
   -al name,lat,long[,max-lat,max-long], --attribute-location name,lat,long[,max-lat,max-long]
-                        [Only NGSI-V2!] Define a location attribute used for the payload by 'name' (The
-                        name of the attribute, e.g.: position), 'lat' (The value for latitude) and 'long'
-                        (The value for longitude). If 'max-lat' and 'max-long' are set, the location
-                        written will be randomly between 'lat' and 'max-lat' and 'long' and 'max-long'
-                        resp. (each including). Note: Multiple location attributes can be defined by
-                        repeating -al.
+                        [Only NGSI-V2!] Define a location attribute used for the payload by 'name' (The name of
+                        the attribute, e.g.: position), 'lat' (The value for latitude) and 'long' (The value for
+                        longitude). If 'max-lat' and 'max-long' are set, the location written will be randomly
+                        between 'lat' and 'max-lat' and 'long' and 'max-long' resp. (each including). Note:
+                        Multiple location attributes can be defined by repeating -al.
   -ab name value, --attribute-boolean name value
-                        [Only NGSI-V2!] Define a boolean attribute used for the payload by 'name' (The
-                        name of the attribute, e.g.: public) and 'value' (One of 'true', 'false' or
-                        'toggle' [ie. randomly switch between true and false]). Note: Multiple boolean
-                        attributes can be defined by repeating -ab.
+                        [Only NGSI-V2!] Define a boolean attribute used for the payload by 'name' (The name of
+                        the attribute, e.g.: public) and 'value' (One of 'true', 'false' or 'toggle' [ie.
+                        randomly switch between true and false]). Note: Multiple boolean attributes can be
+                        defined by repeating -ab.
   -ai indent, --attribute-indent indent
                         Define the number of characters for indenting the created payload. [Default: 0]
-  -r, --dry-run         Do a dry run only - giving the chance to review what WOULD be done incl. seeing
-                        what the payload will look like.
+  -r, --dry-run         Do a dry run only - giving the chance to review what WOULD be done incl. seeing what the
+                        payload will look like.
   -v, --verbose         Generate verbose output.
   -d from to, --delete from to
-                        If set, the entities within the given range (including "from" and "to") will be
-                        deleted.
+                        If set, the entities within the given range (including "from" and "to") will be deleted.
 
 Example #1:
-./opensim.py -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782' -H Fiware-
-service curltest
+opensim -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782' -H Fiware-service
+curltest
 One message is sent using id '1'.
 The tenant 'curltest' will be used as 'Fiware-service' in the header of the post.
 
 Example #2:
-./opensim.py -s my-host.com -n 2 -m 50 ...
-100 messages will be sent (2 threads are sending 50 messages each).The id will be looped from '1' to
-'100'.
+opensim -s my-host.com -n 2 -m 50 ...
+100 messages will be sent (2 threads are sending 50 messages each).The id will be looped from '1' to '100'.
 
 Example #3:
-./opensim.py -s my-host.com -n 5 -m 100 -f 123 -c ...
-500 messages will be sent (5 threads are sending 100 messages each).The id '123' (-f is first id) will be
-used for all messages (-c is static id).
+opensim -s my-host.com -n 5 -m 100 -f 123 -c ...
+500 messages will be sent (5 threads are sending 100 messages each).The id '123' (-f is first id) will be used
+for all messages (-c is static id).
 
 Example #4:
 The payload that will be sent is constructed from the -y and the -aX parameters. Example:
-./opensim.py -y WeatherObserved -an temperature,f,-20,50 -an precipitation,i,1,20 ...
+opensim -y WeatherObserved -an temperature,f,-20,50 -an precipitation,i,1,20 ...
 will generate a payload looking like:
 {
   "id":"1",
@@ -134,7 +130,7 @@ will generate a payload looking like:
 }
 
 Example #5:
-./opensim.py -d 100 200 -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782'
+opensim -d 100 200 -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782'
 
 This will delete all IDs starting from 100 to 200 (inclusive).
 ```
@@ -206,7 +202,7 @@ And remember: For Orion Context Broker the overall number of messages is simply 
 
 ## Update or Insert?
 When sending a message...do I insert a new Context/Entity/Thing/whatever or am I updating an existing one?  
-In short: It depends on the current data-basis. If the entity doesn't exist yet, it will be created, if it already exists, it will be updated. That means: On an empty database the very first call of _opensim.py_ with one id, and an overall number of messages of one, will create a new entity while exact the same call will update the existing one if running again. So it's a good idea to keep track of the data you created and just keep in mind: _opensim.py_ knows how to delete data!
+In short: It depends on the current data-basis. If the entity doesn't exist yet, it will be created, if it already exists, it will be updated. That means: On an empty database the very first call of _opensim_ with one id, and an overall number of messages of one, will create a new entity while exact the same call will update the existing one if running again. So it's a good idea to keep track of the data you created and just keep in mind: _opensim_ knows how to delete data!
 
 # Usage
 
@@ -250,7 +246,7 @@ This will create a Header, that looks like:
 The first approach is default, the latter is enabled when _--insert-always_ is set.    
 * **--datastream-id _id_** \
 [SensorThings only] Unlike Orion Context Broker (with a flat non-SQL-Database), FROST is based on an RDBMS behind a resource-based REST-Api that doesn't let you update multiple tables at once. This is, why you have to deal first with _Things_, based on a specific _Thing_ you have to deal with its _Datastreams_ and once you gathered all the information, you can place your _Observations_ linked to a specific _Datastream_ (identified by its unique _id_).  
-  In order to get rid of all the preparing stuff, you can figure out the needed _Datastream-id_ by hand (using Postman or a database-client of your choice) and set that _id_ with _--datastream-id_ directly. opensim.py will NOT look for a _Thing_ then or find the correct _Datastream_ (by the name of the attribute), but store the attributes values immediately.  
+  In order to get rid of all the preparing stuff, you can figure out the needed _Datastream-id_ by hand (using Postman or a database-client of your choice) and set that _id_ with _--datastream-id_ directly. OpenSim will NOT look for a _Thing_ then or find the correct _Datastream_ (by the name of the attribute), but store the attributes values immediately.  
   Be aware that those _Observations_ may corrupt (logical only, not technical) your data.
 
 ## Define the Load
@@ -304,7 +300,7 @@ As with all other attributes: The _name_ of the attribute is stored within the p
 * **--attribute-string _name value_** \
 Simple enough...a string-literal will be stored.
 * **--attribute-date _name_** \
-[NGSI-V2 only] Same here: The current Date-Time (local time of the machine, opensim.py is executed on in 'ISO 8601'-format) will be stored.
+[NGSI-V2 only] Same here: The current Date-Time (local time of the machine, OpenSim is executed on in 'ISO 8601'-format) will be stored.
 * **--attribute-location _name,lat,long[,max-lat,max-long]_** \
 [NGSI-V2 only] Stores a location (in 'geo:json'-format). Like with number, setting max-lat and max-long will result in a random location within the given range.
 * **--attribute-boolean _name value_** \
@@ -312,7 +308,7 @@ Simple enough...a string-literal will be stored.
 
 ## Useful
 * **--dry-run** \
-When opensim.py starts, it will give a short overview of what will happen ("Will send 1000 messages in 10 threads...(and I might create 1000 new entities!)").  
+When opensim starts, it will give a short overview of what will happen ("Will send 1000 messages in 10 threads...(and I might create 1000 new entities!)").  
 With _--dry-run_ set, the script will stop right before the messages will be sent. This gives you the chance to determine, if the shown action is what you really want!  
 Besides that, the payload is printed out giving you an overview of the data-model that will be created.  
 * **--attribute-indent _indent_** \
@@ -339,7 +335,7 @@ limit=10
 temperature=20
 i=1; while [ $i -le $limit ]; do
   echo "The current temperature is "$temperature
-  ./opensim.py -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,$temperature
+  opensim -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,$temperature
   temperature=$((temperature+1))
 i=$((i+1))
 sleep 60;
@@ -354,7 +350,7 @@ SET /A "temperature = 20"
 :while
 if %i% leq %limit% (
    echo The current temperature is %temperature%
-   opensim.py -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,%temperature%
+   opensim -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,%temperature%
    SET /A "temperature = temperature + 1"
    SET /A "i = i + 1"
    timeout /T 60 /nobreak > nul
