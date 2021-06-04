@@ -589,8 +589,8 @@ def check_arguments(parser, args):
         if not args.delete:
             # check scheme?
             if args.insert_always and (
-                    args.protocol != helper.PROTOCOL_NGSI_V2
-                    and args.protocol != helper.PROTOCOL_NGSI_LD
+                args.protocol != helper.PROTOCOL_NGSI_V2
+                and args.protocol != helper.PROTOCOL_NGSI_LD
             ):
                 parser.error(
                     "Insert always scheme [-i/--insert-always] is only valid "
