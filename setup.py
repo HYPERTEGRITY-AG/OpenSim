@@ -15,7 +15,6 @@ with open("README.md", "r", encoding="utf-8") as fh:
 with open("CHANGELOG.md", "r", encoding="utf-8") as fh:
     change_log = fh.read()
 
-
 setup(
     name="opensim-WillFreitag",
     version="1.1.1",
