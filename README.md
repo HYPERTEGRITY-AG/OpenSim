@@ -2,7 +2,7 @@
 
 # Open Smart City - Sim
 
-Copyright (c) 2021 Will Freitag, Version: 1.1.0
+Copyright (c) 2021 Will Freitag, Version: 1.1.1
 
 ## TL;DR
 _OpenSim_ is a lightweight tool to send test data to an Orion Context Broker or FROST-Server respectively. \
