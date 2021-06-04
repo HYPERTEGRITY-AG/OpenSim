@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import requests
 
-from modules import helper
+from . import helper
 
 # some "consts"
 V2_ENTITIES = "/v2/entities/"

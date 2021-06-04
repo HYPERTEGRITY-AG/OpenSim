@@ -8,7 +8,7 @@ from time import sleep
 import paho.mqtt.client as mqtt  # type: ignore
 import requests
 
-from modules import helper
+from . import helper
 
 # some "const" values
 INVALID_ID: int = -1

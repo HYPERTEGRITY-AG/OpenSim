@@ -5,7 +5,7 @@ import random
 from datetime import datetime
 
 # some "consts"
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 CONTENT_TYPE = "Content-Type"
 APPLICATION_JSON = "application/json"
 # TODO: swagger says, content-type is "application/json;application/ld+json"!
@@ -15,6 +15,10 @@ PROTOCOL_NGSI_V2 = "NGSI-V2"
 PROTOCOL_NGSI_LD = "NGSI-LD"
 PROTOCOL_SENSOR_THINGS_HTTP = "SensorThings-HTTP"
 PROTOCOL_SENSOR_THINGS_MQTT = "SensorThings-MQTT"
+
+
+def get_version():
+    return VERSION
 
 
 def create_id(first_id, prefix, postfix, align, is_ngsi_ld):
