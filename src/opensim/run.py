@@ -9,7 +9,11 @@ from typing import Dict
 
 import requests
 
-from modules import arguments, helper, ngsi, output, sensor_things
+from .modules import helper
+from .modules import output
+from .modules import sensor_things
+from .modules import ngsi
+from .modules import arguments
 
 # some globals
 start = datetime.now()
@@ -695,7 +699,7 @@ def handle_send(args, session, lock, msg_num, max_id_length):
         print("")
 
 
-def main():
+def main(args=None):
     output.print_version()
     args = arguments.parse_arguments()
     # if there was any error on the arguments, the function already gave some hint and exited.

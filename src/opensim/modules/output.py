@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from modules import helper
+from . import helper
 
 
 def print_version():
     print(
-        "opensim.py, Copyright (c) 2021 Will Freitag, Version %s" % helper.VERSION,
+        "OpenSim, Copyright (c) 2021 Will Freitag, Version %s" % helper.get_version(),
         flush=True,
     )
 
