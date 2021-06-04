@@ -9,11 +9,7 @@ from typing import Dict
 
 import requests
 
-from .modules import arguments
-from .modules import helper
-from .modules import ngsi
-from .modules import output
-from .modules import sensor_things
+from .modules import arguments, helper, ngsi, output, sensor_things
 
 # some globals
 start = datetime.now()
