@@ -17,7 +17,7 @@ with open("CHANGELOG.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="opensim-WillFreitag",
-    version="1.1.1",
+    version="1.1.2",
     author="Will Freitag",
     author_email="Wilhelm.Freitag@omp.de",
     description="OpenSim is a lightweight tool to send test data "
