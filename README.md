@@ -5,25 +5,25 @@
 Copyright (c) 2021 Will Freitag, Version: 1.1.2
 
 ## TL;DR
-_OpenSim_ is a lightweight tool to send test data to an Orion Context Broker or FROST-Server respectively. \
+_oscsim_ is a lightweight tool to send test data to an Orion Context Broker or FROST-Server respectively. \
 It can be used to send just a single message to test your installation and also to send thousands of messages in multiple threads in order to stress your installation. \
 Creation of test-data w/o integrating any sensors is another aspect that can be handled with this tool. \
 For this to end, not the complete APIs of both, Orion and FROST are implemented (it's not an Orion- or FROST-Client!), but the API needed to send Data (Contexts and Things/Datastreams/Observations resp.) is in place.  
 
 A simple call of this tool like...
 ```commandline
-$ opensim -s http://myserver.com -p NGSI-V2 -ad dateObserved -an temperature,f,20.5
+$ oscsim -s http://myserver.com -p NGSI-V2 -ad dateObserved -an temperature,f,20.5
 ```
 ...will send one context to an Orion Context Broker at myserver.com with a payload defining a weather observation (date and temperature).  
 And if you don't want to read this documentation at all: Remember that you can use --help at any time! :-)
 ```commandline
-$ opensim -h
-OpenSim, Copyright (c) 2021 Will Freitag, Version 1.1.2
-usage: opensim [-h] -s [protocol]host-name [-p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}] [-i]
-               [-a id] [-H key value] [-f id] [-e PREFIX] [-o POSTFIX] [-c] [-n num] [-m num] [-u]
-               [-q milliseconds] [-l seconds] [-y name] [-an name,type,number[,max-number]] [-as name value]
-               [-ad name] [-al name,lat,long[,max-lat,max-long]] [-ab name value] [-ai indent] [-r] [-v]
-               [-d from to]
+$ oscsim -h
+Open Smart City-Sim, Copyright (c) 2021 Will Freitag, Version 1.1.2
+usage: oscsim [-h] -s [protocol]host-name [-p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}] [-i]
+              [-a id] [-H key value] [-f id] [-e PREFIX] [-o POSTFIX] [-c] [-n num] [-m num] [-u]
+              [-q milliseconds] [-l seconds] [-y name] [-an name,type,number[,max-number]] [-as name value]
+              [-ad name] [-al name,lat,long[,max-lat,max-long]] [-ab name value] [-ai indent] [-r] [-v]
+              [-d from to]
 
 Tool to create some load on Orion Context Broker/FROST-Server.
 
@@ -98,23 +98,23 @@ optional arguments:
                         If set, the entities within the given range (including "from" and "to") will be deleted.
 
 Example #1:
-opensim -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782' -H Fiware-service
+oscsim -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782' -H Fiware-service
 curltest
 One message is sent using id '1'.
 The tenant 'curltest' will be used as 'Fiware-service' in the header of the post.
 
 Example #2:
-opensim -s my-host.com -n 2 -m 50 ...
+ocssim -s my-host.com -n 2 -m 50 ...
 100 messages will be sent (2 threads are sending 50 messages each).The id will be looped from '1' to '100'.
 
 Example #3:
-opensim -s my-host.com -n 5 -m 100 -f 123 -c ...
+oscsim -s my-host.com -n 5 -m 100 -f 123 -c ...
 500 messages will be sent (5 threads are sending 100 messages each).The id '123' (-f is first id) will be used
 for all messages (-c is static id).
 
 Example #4:
 The payload that will be sent is constructed from the -y and the -aX parameters. Example:
-opensim -y WeatherObserved -an temperature,f,-20,50 -an precipitation,i,1,20 ...
+oscsim -y WeatherObserved -an temperature,f,-20,50 -an precipitation,i,1,20 ...
 will generate a payload looking like:
 {
   "id":"1",
@@ -130,7 +130,7 @@ will generate a payload looking like:
 }
 
 Example #5:
-opensim -d 100 200 -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782'
+oscsim -d 100 200 -s my-host.com -H Authorization 'Bearer 039ea6d72a2f32227c2110bd8d78aae33acd6782'
 
 This will delete all IDs starting from 100 to 200 (inclusive).
 ```
@@ -154,9 +154,9 @@ This script may work on later versions of 3, but we do not currently run tests a
 # Installation
 ## From Package
 ### Install
-Run `pip[3] install opensim`.
-### Run OpenSim
-Simply run `opensim`.
+Run `pip[3] install ocssim`.
+### Run Open Smart City-Sim
+Simply run `oscsim`.
 ## From Source
 ### Get Repository
 Clone or download repository from [Github](https://github.com/HYPERTEGRITY-AG/OpenSim).
@@ -170,12 +170,12 @@ Install with: `$ pip install requests`
 * **Eclipse Paho™ MQTT Python Client** \
 Web-site: https://github.com/eclipse/paho.mqtt.python \
 Install with: `$ pip install paho-mqtt`
-### Run OpenSim
-From the `src` directory run `python[3] -m opensim`.
+### Run Open Smart City-Sim
+From the `src` directory run `python[3] -m oscsim`.
 ## What's that "ID"?
 In Orion Context Broker (NGSI-XX), Contexts are stored as entities, and these entities are referred by their **"id"** (e.g. "urn:ngsi-v2:AirQualityObserved:RZ:Obsv4567"). Such an entity will then have some meta-data and one or more attributes. \
 In FROST (SensorThings), It all starts with a "Thing" that has a **"name"** and an internal (numeric) id. Dependencies (Datastreams, Observations) are related to that internal id that is generated by FROST. \
-opensim.py uses a numeric "id" (starting with simply '1') that can easily be looped. 
+oscsim uses a numeric "id" (starting with simply '1') that can easily be looped. 
 This id is then used as the entity's "id" (Orion) and "name" (FROST) respectively.    
 Please note: This numeric id can be prepended/appended with strings, letting it look more like a "real" entity/thing, if wanted.
 
@@ -202,7 +202,7 @@ And remember: For Orion Context Broker the overall number of messages is simply 
 
 ## Update or Insert?
 When sending a message...do I insert a new Context/Entity/Thing/whatever or am I updating an existing one?  
-In short: It depends on the current data-basis. If the entity doesn't exist yet, it will be created, if it already exists, it will be updated. That means: On an empty database the very first call of _opensim_ with one id, and an overall number of messages of one, will create a new entity while exact the same call will update the existing one if running again. So it's a good idea to keep track of the data you created and just keep in mind: _opensim_ knows how to delete data!
+In short: It depends on the current data-basis. If the entity doesn't exist yet, it will be created, if it already exists, it will be updated. That means: On an empty database the very first call of _oscsim_ with one id, and an overall number of messages of one, will create a new entity while exact the same call will update the existing one if running again. So it's a good idea to keep track of the data you created and just keep in mind: _oscsim_ knows how to delete data!
 
 # Usage
 
@@ -246,7 +246,7 @@ This will create a Header, that looks like:
 The first approach is default, the latter is enabled when _--insert-always_ is set.    
 * **--datastream-id _id_** \
 [SensorThings only] Unlike Orion Context Broker (with a flat non-SQL-Database), FROST is based on an RDBMS behind a resource-based REST-Api that doesn't let you update multiple tables at once. This is, why you have to deal first with _Things_, based on a specific _Thing_ you have to deal with its _Datastreams_ and once you gathered all the information, you can place your _Observations_ linked to a specific _Datastream_ (identified by its unique _id_).  
-  In order to get rid of all the preparing stuff, you can figure out the needed _Datastream-id_ by hand (using Postman or a database-client of your choice) and set that _id_ with _--datastream-id_ directly. OpenSim will NOT look for a _Thing_ then or find the correct _Datastream_ (by the name of the attribute), but store the attributes values immediately.  
+  In order to get rid of all the preparing stuff, you can figure out the needed _Datastream-id_ by hand (using Postman or a database-client of your choice) and set that _id_ with _--datastream-id_ directly. Open Smart City-Sim will NOT look for a _Thing_ then or find the correct _Datastream_ (by the name of the attribute), but store the attributes values immediately.  
   Be aware that those _Observations_ may corrupt (logical only, not technical) your data.
 
 ## Define the Load
@@ -300,7 +300,7 @@ As with all other attributes: The _name_ of the attribute is stored within the p
 * **--attribute-string _name value_** \
 Simple enough...a string-literal will be stored.
 * **--attribute-date _name_** \
-[NGSI-V2 only] Same here: The current Date-Time (local time of the machine, OpenSim is executed on in 'ISO 8601'-format) will be stored.
+[NGSI-V2 only] Same here: The current Date-Time (local time of the machine, oscsim is executed on in 'ISO 8601'-format) will be stored.
 * **--attribute-location _name,lat,long[,max-lat,max-long]_** \
 [NGSI-V2 only] Stores a location (in 'geo:json'-format). Like with number, setting max-lat and max-long will result in a random location within the given range.
 * **--attribute-boolean _name value_** \
@@ -308,7 +308,7 @@ Simple enough...a string-literal will be stored.
 
 ## Useful
 * **--dry-run** \
-When opensim starts, it will give a short overview of what will happen ("Will send 1000 messages in 10 threads...(and I might create 1000 new entities!)").  
+When oscsim starts, it will give a short overview of what will happen ("Will send 1000 messages in 10 threads...(and I might create 1000 new entities!)").  
 With _--dry-run_ set, the script will stop right before the messages will be sent. This gives you the chance to determine, if the shown action is what you really want!  
 Besides that, the payload is printed out giving you an overview of the data-model that will be created.  
 * **--attribute-indent _indent_** \
@@ -335,7 +335,7 @@ limit=10
 temperature=20
 i=1; while [ $i -le $limit ]; do
   echo "The current temperature is "$temperature
-  opensim -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,$temperature
+  oscsim -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,$temperature
   temperature=$((temperature+1))
 i=$((i+1))
 sleep 60;
@@ -350,7 +350,7 @@ SET /A "temperature = 20"
 :while
 if %i% leq %limit% (
    echo The current temperature is %temperature%
-   opensim -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,%temperature%
+   oscsim -s server.com -y WeatherObserved -ad dateObserved -an temperature,f,%temperature%
    SET /A "temperature = temperature + 1"
    SET /A "i = i + 1"
    timeout /T 60 /nobreak > nul

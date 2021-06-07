@@ -68,11 +68,11 @@ def create_thing_payload(thing_name, indent):
     payload = dict()
 
     payload["name"] = thing_name
-    payload["description"] = "This Thing was created by opensim.py"
+    payload["description"] = "This Thing was created by oscsim"
 
     location = dict()
     location["name"] = thing_name
-    location["description"] = "This Location was created by opensim.py"
+    location["description"] = "This Location was created by oscsim"
     location["encodingType"] = "application/vnd.geo+json"
     loc = dict()
     loc["type"] = "Point"
@@ -95,7 +95,7 @@ def create_data_stream_payload(data_stream_name, indent):
     payload = dict()
 
     payload["name"] = data_stream_name
-    payload["description"] = "This Datastream was created by opensim.py"
+    payload["description"] = "This Datastream was created by oscsim"
     payload[
         "observationType"
     ] = "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"
@@ -109,13 +109,13 @@ def create_data_stream_payload(data_stream_name, indent):
 
     observed_property = dict()
     observed_property["name"] = data_stream_name
-    observed_property["description"] = "This ObservedProperty was created by opensim.py"
+    observed_property["description"] = "This ObservedProperty was created by oscsim"
     observed_property["definition"] = "unknown"
 
     payload["ObservedProperty"] = observed_property
 
     sensor = dict()
-    sensor["name"] = "Pseudo Sensor created by opensim.py"
+    sensor["name"] = "Pseudo Sensor created by oscsim"
     sensor["description"] = "I'm not real!"
     sensor["encodingType"] = "application/pdf"
     sensor["metadata"] = "https://i-dont-have.any/data-sheet.pdf"
