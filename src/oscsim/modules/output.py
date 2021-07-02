@@ -7,7 +7,7 @@ from . import helper
 
 def print_version():
     print(
-        "Open Smart City-Sim, Copyright (c) 2021 Will Freitag, Version %s"
+        "Open Smart City-Sim, Copyright (c) 2021 Will Freitag, Version %s (build: 1)"
         % helper.get_version(),
         flush=True,
     )

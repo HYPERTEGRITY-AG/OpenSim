@@ -605,7 +605,6 @@ def wait_for_send_threads(limit_time, verbose, msg_num, unlimited):
 
         if limit_time is not None and temp_s >= limit_time:
             ready = True
-            print("\nTime is up!", flush=True)
             continue
 
         if not verbose:
@@ -618,6 +617,14 @@ def wait_for_send_threads(limit_time, verbose, msg_num, unlimited):
             if t.is_alive():
                 ready = False
                 continue
+
+    if not verbose:
+        output.print_messages_send(
+            overall_messages, errors, overall_time, temp_ms, msg_num, unlimited
+        )
+
+    if limit_time is not None:
+        print("\nTime is up!", flush=True)
 
     return temp_ms
 
