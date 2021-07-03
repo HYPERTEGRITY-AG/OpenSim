@@ -12,4 +12,3 @@ jobs:
         with:
           python-root-list: "src/oscsim/run.py src/oscsim/modules/arguments.py src/oscsim/modules/helper.py src/oscsim/modules/ngsi.py src/oscsim/modules/output.py src/oscsim/modules/sensor_things.py"
           use-mypy: false
-

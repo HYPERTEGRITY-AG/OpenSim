@@ -24,7 +24,6 @@ usage: oscsim [-h] -s [protocol]host-name [-p {NGSI-V2,NGSI-LD,SensorThings-MQTT
               [-q milliseconds] [-l seconds] [-y name] [-an name,type,number[,max-number]] [-as name value]
               [-ad name] [-al name,lat,long[,max-lat,max-long]] [-ab name value] [-ai indent] [-r] [-v]
               [-d from to]
-
 Tool to create some load on Orion Context Broker/FROST-Server.
 
 optional arguments:
@@ -104,7 +103,8 @@ One message is sent using id '1'.
 The tenant 'curltest' will be used as 'Fiware-service' in the header of the post.
 
 Example #2:
-ocssim -s my-host.com -n 2 -m 50 ...
+ocssim -s my-host.com -n 2 -m 50 ...git commit -a -m "removed mypy from linting - it has a bug reporting false positive"
+
 100 messages will be sent (2 threads are sending 50 messages each).The id will be looped from '1' to '100'.
 
 Example #3:
