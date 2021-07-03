@@ -17,7 +17,7 @@ with open("CHANGELOG.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="oscsim-WillFreitag",
-    version="1.1.2",
+    version="1.1.1",
     author="Will Freitag",
     author_email="Wilhelm.Freitag@omp.de",
     description="Open Smart City-Sim is a lightweight tool to send test data "

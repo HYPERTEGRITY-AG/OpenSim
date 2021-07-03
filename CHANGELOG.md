@@ -4,9 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2021-xx-xx
-This release is about packaging and distributing.  
-The package is renamed from _opensim_ to _oscsim_, since opensim is already taken on PyPI.
+## [1.1.1] - 2021-07-03
+This release is mostly about packaging and distributing.  
+The package is renamed from _opensim_ to _oscsim_, since "opensim" is already taken on PyPI.
+Some minor bugs were fixed.
 
 ### Added
 - Nothing

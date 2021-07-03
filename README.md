@@ -18,7 +18,7 @@ $ oscsim -s http://myserver.com -p NGSI-V2 -ad dateObserved -an temperature,f,20
 And if you don't want to read this documentation at all: Remember that you can use --help at any time! :-)
 ```commandline
 $ oscsim -h
-Open Smart City-Sim, Copyright (c) 2021 Will Freitag, Version 1.1.2
+Open Smart City-Sim, Copyright (c) 2021 Will Freitag, Version 1.1.1
 usage: oscsim [-h] -s [protocol]host-name [-p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}] [-i]
               [-a id] [-H key value] [-f id] [-e PREFIX] [-o POSTFIX] [-c] [-n num] [-m num] [-u]
               [-q milliseconds] [-l seconds] [-y name] [-an name,type,number[,max-number]] [-as name value]

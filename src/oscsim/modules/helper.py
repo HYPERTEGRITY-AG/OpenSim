@@ -5,7 +5,7 @@ import random
 from datetime import datetime
 
 # some "consts"
-VERSION = "1.1.2"
+VERSION = "1.1.1"
 CONTENT_TYPE = "Content-Type"
 APPLICATION_JSON = "application/json"
 # TODO: swagger says, content-type is "application/json;application/ld+json"!
