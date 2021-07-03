@@ -1,6 +1,6 @@
 # HowTo: Parse a gpx-File and Store the Locations in Orion Context Broker/FROST-Server
 
-This short "how to" will show how to parse a gpx-file with [xmlstarlet](http://xmlstar.sourceforge.net/doc/UG/xmlstarlet-ug.html) and send the positions timed with opensim.py.
+This short "how to" will show how to parse a gpx-file with [xmlstarlet](http://xmlstar.sourceforge.net/doc/UG/xmlstarlet-ug.html) and send the positions timed with oscsim.
 
 ## Prerequisites
 * You need a gpx-file with a route.
@@ -40,7 +40,7 @@ Find a short [gpx-file (sample.gpx)](./files/sample.gpx) in the [files-folder](.
 ## Prepare the Script 
 Take the [script](./files/track.sh) from the [files-folder](./files) and change
 * the filename of the gpx-file to your needs (line #4)
-* the call to opensim.py to your needs (line #60)
+* the call to oscsim to your needs (line #60)
 
 ## Run the Script
 Let the script run and voilá - we are simulating a bus driving through your city continuously sending its location!

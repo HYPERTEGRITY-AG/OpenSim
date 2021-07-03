@@ -16,11 +16,11 @@ with open("CHANGELOG.md", "r", encoding="utf-8") as fh:
     change_log = fh.read()
 
 setup(
-    name="opensim-WillFreitag",
+    name="oscsim-WillFreitag",
     version="1.1.1",
     author="Will Freitag",
     author_email="Wilhelm.Freitag@omp.de",
-    description="OpenSim is a lightweight tool to send test data "
+    description="Open Smart City-Sim is a lightweight tool to send test data "
                 "to an Orion Context Broker or FROST-Server respectively.",
     license='MIT License',
     long_description=long_description,
@@ -41,7 +41,7 @@ setup(
     ],
     package_dir={'': 'src'},
     packages=find_packages('src'),
-    entry_points={'console_scripts': ['opensim = opensim.run:main']},
+    entry_points={'console_scripts': ['oscsim = oscsim.run:main']},
     python_requires='>=3.6',
     install_requires=install_requires
 )

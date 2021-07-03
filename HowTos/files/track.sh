@@ -56,8 +56,8 @@ do
   echo "Sending with:"
   echo "  lat: ${lat[$i]}"
   echo "  lon: ${lon[$i]}"
-  # TODO: Change the call to opensim.py to your needs
-  ./opensim.py -s myserver.com -y BusTracker -ad dateObserved -al "Current Location",${lat[$i]},${lon[$i]}
+  # TODO: Change the call to oscsim to your needs
+  oscsim -s myserver.com -y BusTracker -ad dateObserved -al "Current Location",${lat[$i]},${lon[$i]}
   echo
 done
 

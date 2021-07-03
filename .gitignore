@@ -1,3 +1,3 @@
 .idea/
 __pycache__/
-src/opensim/modules/__pycache__/
+src/oscsim/modules/__pycache__/
