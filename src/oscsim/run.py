@@ -593,6 +593,8 @@ def start_send_threads():
 
 
 def wait_for_send_threads(limit_time, verbose, msg_num, unlimited):
+    global send_threads, halt
+
     ready = False
     temp_ms = 0
 
@@ -604,8 +606,7 @@ def wait_for_send_threads(limit_time, verbose, msg_num, unlimited):
         temp_ms = int(temp_delta.total_seconds() * 1000)
 
         if limit_time is not None and temp_s >= limit_time:
-            ready = True
-            continue
+            halt = True
 
         if not verbose:
             output.print_messages_send(

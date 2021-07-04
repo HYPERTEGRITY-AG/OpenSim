@@ -16,8 +16,8 @@ with open("CHANGELOG.md", "r", encoding="utf-8") as fh:
     change_log = fh.read()
 
 setup(
-    name="oscsim-WillFreitag",
-    version="1.1.1",
+    name="oscsim",
+    version="1.1.2",
     author="Will Freitag",
     author_email="Wilhelm.Freitag@omp.de",
     description="Open Smart City-Sim is a lightweight tool to send test data "
