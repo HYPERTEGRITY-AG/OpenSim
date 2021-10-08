@@ -15,7 +15,7 @@ PROTOCOL_NGSI_V2 = "NGSI-V2"
 PROTOCOL_NGSI_LD = "NGSI-LD"
 PROTOCOL_SENSOR_THINGS_HTTP = "SensorThings-HTTP"
 PROTOCOL_SENSOR_THINGS_MQTT = "SensorThings-MQTT"
-
+PROTOCOL_DIRECT_QL = "DIRECT-QL"
 
 def get_version():
     return VERSION
@@ -220,6 +220,11 @@ def create_payload_ngsi_v2(first_id, meta_data, args):
 
             attr["value"] = coord
             payload[attribute_args[0]] = attr
+
+    if args.protocol == PROTOCOL_DIRECT_QL:
+        data = [payload]
+        payload = dict()
+        payload["data"] = data
 
     if args.indent > 0:
         return json.dumps(payload, indent=args.indent)

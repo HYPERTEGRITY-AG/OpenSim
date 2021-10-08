@@ -5,6 +5,7 @@ import requests
 from . import helper
 
 # some "consts"
+QL_NOTIFY = "/v2/notify"
 V2_ENTITIES = "/v2/entities/"
 LD_ENTITIES = "/ngsi-ld/v1/entities/"
 OPTIONS_UPSERT = "?options=upsert"
@@ -36,6 +37,9 @@ def do_post(session, host, first_id, headers, upsert, args):
         url = host + V2_ENTITIES
         if upsert:
             url += OPTIONS_UPSERT
+        payload = helper.create_payload_ngsi_v2(first_id, True, args)
+    elif args.protocol == helper.PROTOCOL_DIRECT_QL:
+        url = host + QL_NOTIFY
         payload = helper.create_payload_ngsi_v2(first_id, True, args)
     else:
         url = host + LD_ENTITIES

@@ -155,8 +155,12 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
         if (
             args.protocol == helper.PROTOCOL_NGSI_V2
             or args.protocol == helper.PROTOCOL_NGSI_LD
+            or args.protocol == helper.PROTOCOL_DIRECT_QL
         ):
-            if args.protocol == helper.PROTOCOL_NGSI_V2:
+            if (
+                args.protocol == helper.PROTOCOL_NGSI_V2
+                or args.protocol == helper.PROTOCOL_DIRECT_QL
+            ):
                 headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
             else:
                 headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON_LD}
@@ -173,7 +177,11 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                     okay = False
                 else:
                     ms = int(resp.elapsed.total_seconds() * 1000)
-                    okay = resp.status_code == 204 or resp.status_code == 201
+                    okay = (
+                        resp.status_code == 204
+                        or resp.status_code == 201
+                        or resp.status_code == 200
+                        )
             else:
                 resp, payload = ngsi.do_patch(session, host, first_id, headers, args)
                 if resp is None:

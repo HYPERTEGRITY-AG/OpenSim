@@ -116,6 +116,7 @@ def parse_arguments():
             helper.PROTOCOL_NGSI_LD,
             helper.PROTOCOL_SENSOR_THINGS_MQTT,
             helper.PROTOCOL_SENSOR_THINGS_HTTP,
+            helper.PROTOCOL_DIRECT_QL,
         ],
         default=helper.PROTOCOL_NGSI_V2,
         dest="protocol",
@@ -591,6 +592,7 @@ def check_arguments(parser, args):
             if args.insert_always and (
                 args.protocol != helper.PROTOCOL_NGSI_V2
                 and args.protocol != helper.PROTOCOL_NGSI_LD
+                and args.protocol != helper.PROTOCOL_DIRECT_QL
             ):
                 parser.error(
                     "Insert always scheme [-i/--insert-always] is only valid "
@@ -600,6 +602,7 @@ def check_arguments(parser, args):
             # is there any payload?
             if (
                 args.protocol == helper.PROTOCOL_NGSI_V2
+                or args.protocol == helper.PROTOCOL_DIRECT_QL
                 or args.protocol != helper.PROTOCOL_NGSI_LD
             ):
                 if (
