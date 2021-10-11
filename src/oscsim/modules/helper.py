@@ -143,7 +143,7 @@ def create_observation_payload(value, indent):
         return json.dumps(payload)
 
 
-def create_payload_ngsi_v2(first_id, meta_data, args):
+def create_payload_ngsi_v2(first_id, meta_data, args, valuecounter = None):
     payload = dict()
     if meta_data:
         if first_id is not None:
@@ -176,7 +176,9 @@ def create_payload_ngsi_v2(first_id, meta_data, args):
                 attr["type"] = "Number"
 
             # value
-            value = create_value_from_attribute_args(attribute_args)
+            value = valuecounter
+            if valuecounter is None:
+                value = create_value_from_attribute_args(attribute_args)
             attr["value"] = value
             payload[attribute_args[0]] = attr
 

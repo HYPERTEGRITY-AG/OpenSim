@@ -22,7 +22,7 @@ not_deleted = 0
 send_threads = []
 delete_thread = Thread()
 halt = False
-
+linear_counter = 0
 
 def do_delete(session, lock, args, max_id_length):
     global errors, deleted, not_deleted, overall_messages
@@ -128,7 +128,7 @@ def do_delete(session, lock, args, max_id_length):
 
 
 def do_send(mqtt_client, session, lock, args, offset, max_id_length):
-    global errors, unique_errors, overall_time, overall_messages
+    global errors, unique_errors, overall_time, overall_messages, linear_counter
 
     first_id = args.first_id + offset
     host = helper.create_host_url(args.server)
@@ -169,8 +169,17 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                 headers.update(args.headers)
 
             if args.insert_always:
+                valuecounter = None
+                if (
+                    args.protocol == helper.PROTOCOL_DIRECT_QL
+                    and args.linear_increment
+                    ):
+                    with lock:
+                        valuecounter = linear_counter
+                        linear_counter += 1
+
                 resp, payload = ngsi.do_post(
-                    session, host, first_id, headers, True, args
+                    session, host, first_id, headers, True, args, valuecounter
                 )
                 if resp is None:
                     ms = 0

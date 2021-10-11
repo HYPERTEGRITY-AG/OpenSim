@@ -129,7 +129,7 @@ def parse_arguments():
         dest="insert_always",
         action="store_true",
         default=False,
-        help="[Only NGSI-V2 and NGSI-LD!] If set, the contexts will always be inserted "
+        help="[Only NGSI-V2, DIRECT-QL(mandatory) and NGSI-LD!] If set, the contexts will always be inserted "
         "(via POST with option 'upsert') instead "
         "of trying to update first (via PATCH) and insert (via POST), if not "
         "existing (i.e. PATCH returns '404 Not Found').",
@@ -252,7 +252,16 @@ def parse_arguments():
         "--type",
         metavar="name",
         dest="type",
-        help="[Only NGSI-V2 and NGSI-LD!] If set, this type-name will be used in the payload.",
+        help="[Only NGSI-V2, DIRECT-QL(mandatory) and NGSI-LD!] If set, this type-name will be used in the payload.",
+    )
+
+    parser.add_argument(
+        "-lc",
+        "--linear-counter",
+        dest="linear_increment",
+        action="store_true",
+        default=False,
+        help="[Only DIRECT-QL] If set, Number values in the payload are linearily increasing instead of random value.",
     )
 
     parser.add_argument(

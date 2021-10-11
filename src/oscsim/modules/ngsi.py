@@ -32,7 +32,7 @@ def do_delete(session, host, ngsi_id, headers, args):
         return None
 
 
-def do_post(session, host, first_id, headers, upsert, args):
+def do_post(session, host, first_id, headers, upsert, args, valuecounter = None):
     if args.protocol == helper.PROTOCOL_NGSI_V2:
         url = host + V2_ENTITIES
         if upsert:
@@ -40,7 +40,7 @@ def do_post(session, host, first_id, headers, upsert, args):
         payload = helper.create_payload_ngsi_v2(first_id, True, args)
     elif args.protocol == helper.PROTOCOL_DIRECT_QL:
         url = host + QL_NOTIFY
-        payload = helper.create_payload_ngsi_v2(first_id, True, args)
+        payload = helper.create_payload_ngsi_v2(first_id, True, args, valuecounter)
     else:
         url = host + LD_ENTITIES
         if upsert:
