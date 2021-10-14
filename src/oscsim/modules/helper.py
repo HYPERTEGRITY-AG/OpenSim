@@ -3,6 +3,7 @@
 import json
 import random
 from datetime import datetime
+from . import dataload
 
 # some "consts"
 VERSION = "1.1.2"
@@ -143,7 +144,7 @@ def create_observation_payload(value, indent):
         return json.dumps(payload)
 
 
-def create_payload_ngsi_v2(first_id, meta_data, args, valuecounter = None):
+def create_payload_ngsi_v2(first_id, meta_data, args, number_payload = None):
     payload = dict()
     if meta_data:
         if first_id is not None:
@@ -165,22 +166,9 @@ def create_payload_ngsi_v2(first_id, meta_data, args, valuecounter = None):
             }
             payload[date_time[0]] = attr
 
-    if args.numbers is not None:
-        for number in args.numbers:
-            attribute_args = number[0].split(",")
-
-            attr = {}
-
-            # type
-            if attribute_args[1] == "i" or attribute_args[1] == "f":
-                attr["type"] = "Number"
-
-            # value
-            value = valuecounter
-            if valuecounter is None:
-                value = create_value_from_attribute_args(attribute_args)
-            attr["value"] = value
-            payload[attribute_args[0]] = attr
+    if number_payload is not None:
+        for number in number_payload:
+            payload[number.getnameforitem()] = number.getdictionaryforitem()
 
     if args.strings is not None:
         for string in args.strings:

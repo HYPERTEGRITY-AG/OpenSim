@@ -256,15 +256,6 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "-lc",
-        "--linear-counter",
-        dest="linear_increment",
-        action="store_true",
-        default=False,
-        help="[Only DIRECT-QL] If set, Number values in the payload are linearily increasing instead of random value.",
-    )
-
-    parser.add_argument(
         "-an",
         "--attribute-number",
         metavar="name,type,number[,max-number]",
@@ -274,7 +265,7 @@ def parse_arguments():
         help="Define a number attribute used for the payload by 'name' (The name "
         "of the "
         "attribute, e.g.: temperature), 'type' (One of i [integer] or "
-        "f [floating point])"
+        "of lc [linear counter] or f [floating point])"
         "and 'number' (The value to be used). If 'max-number' is set, the "
         "number written will be"
         " randomly between 'number' and 'max-number' (each including). "
@@ -446,7 +437,8 @@ def check_arguments(parser, args):
                         "-an argument ['-an %s'] expects 3 or 4 comma-delimited "
                         "parameters!" % ",".join(attribute_args)
                     )
-                if attribute_args[1] == "i":
+                if (attribute_args[1] == "i"
+                    or attribute_args[1] == "lc"):
                     t = 0
                     f = 0
                     try:
@@ -496,7 +488,7 @@ def check_arguments(parser, args):
                             )
                 else:
                     parser.error(
-                        'Please check attribute "%s": type must be one of [i | f]!'
+                        'Please check attribute "%s": type must be one of [i | lc | f]!'
                         % attribute_args[0]
                     )
 
@@ -605,7 +597,7 @@ def check_arguments(parser, args):
             ):
                 parser.error(
                     "Insert always scheme [-i/--insert-always] is only valid "
-                    "for NGSI-V2 and NGSI-LD!"
+                    "for NGSI-V2, DIRECT-QL and NGSI-LD!"
                 )
 
             # is there any payload?

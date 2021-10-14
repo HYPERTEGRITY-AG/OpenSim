@@ -9,7 +9,7 @@ from typing import Dict
 
 import requests
 
-from .modules import arguments, helper, ngsi, output, sensor_things
+from .modules import arguments, helper, ngsi, output, sensor_things, dataload
 
 # some globals
 start = datetime.now()
@@ -22,7 +22,7 @@ not_deleted = 0
 send_threads = []
 delete_thread = Thread()
 halt = False
-linear_counter = 0
+number_payload = [] # Array items are DataItem type
 
 def do_delete(session, lock, args, max_id_length):
     global errors, deleted, not_deleted, overall_messages
@@ -128,7 +128,7 @@ def do_delete(session, lock, args, max_id_length):
 
 
 def do_send(mqtt_client, session, lock, args, offset, max_id_length):
-    global errors, unique_errors, overall_time, overall_messages, linear_counter
+    global errors, unique_errors, overall_time, overall_messages, number_payload
 
     first_id = args.first_id + offset
     host = helper.create_host_url(args.server)
@@ -169,17 +169,8 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
                 headers.update(args.headers)
 
             if args.insert_always:
-                valuecounter = None
-                if (
-                    args.protocol == helper.PROTOCOL_DIRECT_QL
-                    and args.linear_increment
-                    ):
-                    with lock:
-                        valuecounter = linear_counter
-                        linear_counter += 1
-
                 resp, payload = ngsi.do_post(
-                    session, host, first_id, headers, True, args, valuecounter
+                    session, host, first_id, headers, True, args, number_payload
                 )
                 if resp is None:
                     ms = 0
@@ -585,6 +576,20 @@ def handle_delete(args, session, lock, max_id_length):
 
     print("\nReady", flush=True)
 
+def create_number_loads(args, lock):
+    if args.numbers is not None:
+        for number in args.numbers:
+            numberdata = None
+            attribute_args = number[0].split(",")
+            if attribute_args[1] == "i":
+                numberdata = dataload.RandomIntegerNumberItem(attribute_args)
+            elif attribute_args[1] == "lc":
+                numberdata = dataload.LCIntegerNumberItem(attribute_args, lock)
+            else:
+                numberdata = dataload.RandomFloatNumberItem(attribute_args)
+
+            number_payload.append(numberdata)
+
 
 def create_send_threads(args, mqtt_client, session, lock, max_id_length):
     print("Starting %i thread(s)" % args.num_threads, end="", flush=True)
@@ -693,6 +698,7 @@ def handle_send(args, session, lock, msg_num, max_id_length):
         else None
     )
 
+    create_number_loads(args, lock)
     create_send_threads(args, mqtt_client, session, lock, max_id_length)
 
     start = datetime.now()
