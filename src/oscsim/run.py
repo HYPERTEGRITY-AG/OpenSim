@@ -668,10 +668,13 @@ def stop_send_threads():
 
 
 def handle_send(args, session, lock, msg_num, max_id_length):
-    global start, send_threads
+    global start, send_threads, number_payload
 
     # noinspection PyTypeChecker
     signal.signal(signal.SIGINT, signal_handler)
+
+    # Needs to create some loads so that they are shown correctly
+    create_number_loads(args, lock)
 
     # print what will be done...
     output.print_server_used(False, args.server)
@@ -682,7 +685,7 @@ def handle_send(args, session, lock, msg_num, max_id_length):
     else:
         output.print_data_stream_id_used(args.datastream_id)
     if args.dry_run:
-        output.print_payload(args)
+        output.print_payload(args, number_payload)
     output.print_will_send_messages(args, msg_num)
     if args.frequency is not None:
         output.print_frequency(args.frequency, args.num_threads > 1)
@@ -698,7 +701,6 @@ def handle_send(args, session, lock, msg_num, max_id_length):
         else None
     )
 
-    create_number_loads(args, lock)
     create_send_threads(args, mqtt_client, session, lock, max_id_length)
 
     start = datetime.now()

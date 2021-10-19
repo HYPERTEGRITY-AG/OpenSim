@@ -6,7 +6,7 @@ from datetime import datetime
 from . import dataload
 
 # some "consts"
-VERSION = "1.1.2"
+VERSION = "1.2.0"
 CONTENT_TYPE = "Content-Type"
 APPLICATION_JSON = "application/json"
 # TODO: swagger says, content-type is "application/json;application/ld+json"!

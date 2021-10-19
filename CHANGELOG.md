@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2021-10-19
+This release contains mainly 2 topics:
+* **Direct Quantumleap loadtesting** - Starting with this release it is now possible send payload directly to Quantumleap.
+* **Changes in Options** - This release has 2 new options. DIRECT-QL ehanges url and test load a bit and lc in number payload add linearily increasing integer value. Both require using insert-always option.
+
+### Added
+- Option DIRECT-QL for protocols.
+- Option -lc for number payload.
+
+### Deleted
+- Nothing
+
+### Changed
+- Internal creation of number payload when using protocol NGSI-V2 or DIRECT-QL in conjunction with insert always.
+
 ## [1.1.2] - 2021-07-04
 This release contains bugfixes only.
 

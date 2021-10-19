@@ -265,7 +265,7 @@ def parse_arguments():
         help="Define a number attribute used for the payload by 'name' (The name "
         "of the "
         "attribute, e.g.: temperature), 'type' (One of i [integer] or "
-        "of lc [linear counter] or f [floating point])"
+        "lc [linear counter] or f [floating point])"
         "and 'number' (The value to be used). If 'max-number' is set, the "
         "number written will be"
         " randomly between 'number' and 'max-number' (each including). "
