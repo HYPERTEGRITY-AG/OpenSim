@@ -74,7 +74,8 @@ def print_type_of_server(protocol):
 
 
 def print_schema(args):
-    if args.protocol == helper.PROTOCOL_NGSI_V2:
+    if (args.protocol == helper.PROTOCOL_NGSI_V2
+        or args.protocol == helper.PROTOCOL_DIRECT_QL):
         if args.insert_always:
             print(
                 "Note: POST-always schema is used to store contexts. "
@@ -158,18 +159,19 @@ def print_id_used(args, msg_num):
             )
 
 
-def print_payload(args):
-    if args.protocol == helper.PROTOCOL_NGSI_V2:
+def print_payload(args, number_payload):
+    if (args.protocol == helper.PROTOCOL_NGSI_V2
+        or args.protocol == helper.PROTOCOL_DIRECT_QL):
         if args.insert_always:
             print(
                 "The payload will look like:\n%s"
-                % helper.create_payload_ngsi_v2(args.first_id, True, args),
+                % helper.create_payload_ngsi_v2(args.first_id, True, args, number_payload),
                 flush=True,
             )
         else:
             print(
                 "The payload will look like:\n%s"
-                % helper.create_payload_ngsi_v2(None, False, args),
+                % helper.create_payload_ngsi_v2(None, False, args, number_payload),
                 flush=True,
             )
     elif args.protocol == helper.PROTOCOL_NGSI_LD:

@@ -3,9 +3,10 @@
 import json
 import random
 from datetime import datetime
+from . import dataload
 
 # some "consts"
-VERSION = "1.1.2"
+VERSION = "1.2.0"
 CONTENT_TYPE = "Content-Type"
 APPLICATION_JSON = "application/json"
 # TODO: swagger says, content-type is "application/json;application/ld+json"!
@@ -15,7 +16,7 @@ PROTOCOL_NGSI_V2 = "NGSI-V2"
 PROTOCOL_NGSI_LD = "NGSI-LD"
 PROTOCOL_SENSOR_THINGS_HTTP = "SensorThings-HTTP"
 PROTOCOL_SENSOR_THINGS_MQTT = "SensorThings-MQTT"
-
+PROTOCOL_DIRECT_QL = "DIRECT-QL"
 
 def get_version():
     return VERSION
@@ -143,7 +144,7 @@ def create_observation_payload(value, indent):
         return json.dumps(payload)
 
 
-def create_payload_ngsi_v2(first_id, meta_data, args):
+def create_payload_ngsi_v2(first_id, meta_data, args, number_payload = None):
     payload = dict()
     if meta_data:
         if first_id is not None:
@@ -165,20 +166,9 @@ def create_payload_ngsi_v2(first_id, meta_data, args):
             }
             payload[date_time[0]] = attr
 
-    if args.numbers is not None:
-        for number in args.numbers:
-            attribute_args = number[0].split(",")
-
-            attr = {}
-
-            # type
-            if attribute_args[1] == "i" or attribute_args[1] == "f":
-                attr["type"] = "Number"
-
-            # value
-            value = create_value_from_attribute_args(attribute_args)
-            attr["value"] = value
-            payload[attribute_args[0]] = attr
+    if number_payload is not None:
+        for number in number_payload:
+            payload[number.getnameforitem()] = number.getdictionaryforitem()
 
     if args.strings is not None:
         for string in args.strings:
@@ -220,6 +210,11 @@ def create_payload_ngsi_v2(first_id, meta_data, args):
 
             attr["value"] = coord
             payload[attribute_args[0]] = attr
+
+    if args.protocol == PROTOCOL_DIRECT_QL:
+        data = [payload]
+        payload = dict()
+        payload["data"] = data
 
     if args.indent > 0:
         return json.dumps(payload, indent=args.indent)

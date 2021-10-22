@@ -9,7 +9,7 @@ from typing import Dict
 
 import requests
 
-from .modules import arguments, helper, ngsi, output, sensor_things
+from .modules import arguments, helper, ngsi, output, sensor_things, dataload
 
 # some globals
 start = datetime.now()
@@ -22,7 +22,7 @@ not_deleted = 0
 send_threads = []
 delete_thread = Thread()
 halt = False
-
+number_payload = [] # Array items are DataItem type
 
 def do_delete(session, lock, args, max_id_length):
     global errors, deleted, not_deleted, overall_messages
@@ -128,7 +128,7 @@ def do_delete(session, lock, args, max_id_length):
 
 
 def do_send(mqtt_client, session, lock, args, offset, max_id_length):
-    global errors, unique_errors, overall_time, overall_messages
+    global errors, unique_errors, overall_time, overall_messages, number_payload
 
     first_id = args.first_id + offset
     host = helper.create_host_url(args.server)
@@ -155,8 +155,12 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
         if (
             args.protocol == helper.PROTOCOL_NGSI_V2
             or args.protocol == helper.PROTOCOL_NGSI_LD
+            or args.protocol == helper.PROTOCOL_DIRECT_QL
         ):
-            if args.protocol == helper.PROTOCOL_NGSI_V2:
+            if (
+                args.protocol == helper.PROTOCOL_NGSI_V2
+                or args.protocol == helper.PROTOCOL_DIRECT_QL
+            ):
                 headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON}
             else:
                 headers = {helper.CONTENT_TYPE: helper.APPLICATION_JSON_LD}
@@ -166,14 +170,18 @@ def do_send(mqtt_client, session, lock, args, offset, max_id_length):
 
             if args.insert_always:
                 resp, payload = ngsi.do_post(
-                    session, host, first_id, headers, True, args
+                    session, host, first_id, headers, True, args, number_payload
                 )
                 if resp is None:
                     ms = 0
                     okay = False
                 else:
                     ms = int(resp.elapsed.total_seconds() * 1000)
-                    okay = resp.status_code == 204 or resp.status_code == 201
+                    okay = (
+                        resp.status_code == 204
+                        or resp.status_code == 201
+                        or resp.status_code == 200
+                        )
             else:
                 resp, payload = ngsi.do_patch(session, host, first_id, headers, args)
                 if resp is None:
@@ -568,6 +576,20 @@ def handle_delete(args, session, lock, max_id_length):
 
     print("\nReady", flush=True)
 
+def create_number_loads(args, lock):
+    if args.numbers is not None:
+        for number in args.numbers:
+            numberdata = None
+            attribute_args = number[0].split(",")
+            if attribute_args[1] == "i":
+                numberdata = dataload.RandomIntegerNumberItem(attribute_args)
+            elif attribute_args[1] == "lc":
+                numberdata = dataload.LCIntegerNumberItem(attribute_args, lock)
+            else:
+                numberdata = dataload.RandomFloatNumberItem(attribute_args)
+
+            number_payload.append(numberdata)
+
 
 def create_send_threads(args, mqtt_client, session, lock, max_id_length):
     print("Starting %i thread(s)" % args.num_threads, end="", flush=True)
@@ -646,10 +668,13 @@ def stop_send_threads():
 
 
 def handle_send(args, session, lock, msg_num, max_id_length):
-    global start, send_threads
+    global start, send_threads, number_payload
 
     # noinspection PyTypeChecker
     signal.signal(signal.SIGINT, signal_handler)
+
+    # Needs to create some loads so that they are shown correctly
+    create_number_loads(args, lock)
 
     # print what will be done...
     output.print_server_used(False, args.server)
@@ -660,7 +685,7 @@ def handle_send(args, session, lock, msg_num, max_id_length):
     else:
         output.print_data_stream_id_used(args.datastream_id)
     if args.dry_run:
-        output.print_payload(args)
+        output.print_payload(args, number_payload)
     output.print_will_send_messages(args, msg_num)
     if args.frequency is not None:
         output.print_frequency(args.frequency, args.num_threads > 1)

@@ -116,6 +116,7 @@ def parse_arguments():
             helper.PROTOCOL_NGSI_LD,
             helper.PROTOCOL_SENSOR_THINGS_MQTT,
             helper.PROTOCOL_SENSOR_THINGS_HTTP,
+            helper.PROTOCOL_DIRECT_QL,
         ],
         default=helper.PROTOCOL_NGSI_V2,
         dest="protocol",
@@ -128,7 +129,7 @@ def parse_arguments():
         dest="insert_always",
         action="store_true",
         default=False,
-        help="[Only NGSI-V2 and NGSI-LD!] If set, the contexts will always be inserted "
+        help="[Only NGSI-V2, DIRECT-QL(mandatory) and NGSI-LD!] If set, the contexts will always be inserted "
         "(via POST with option 'upsert') instead "
         "of trying to update first (via PATCH) and insert (via POST), if not "
         "existing (i.e. PATCH returns '404 Not Found').",
@@ -251,7 +252,7 @@ def parse_arguments():
         "--type",
         metavar="name",
         dest="type",
-        help="[Only NGSI-V2 and NGSI-LD!] If set, this type-name will be used in the payload.",
+        help="[Only NGSI-V2, DIRECT-QL(mandatory) and NGSI-LD!] If set, this type-name will be used in the payload.",
     )
 
     parser.add_argument(
@@ -264,7 +265,7 @@ def parse_arguments():
         help="Define a number attribute used for the payload by 'name' (The name "
         "of the "
         "attribute, e.g.: temperature), 'type' (One of i [integer] or "
-        "f [floating point])"
+        "lc [linear counter] or f [floating point])"
         "and 'number' (The value to be used). If 'max-number' is set, the "
         "number written will be"
         " randomly between 'number' and 'max-number' (each including). "
@@ -436,7 +437,8 @@ def check_arguments(parser, args):
                         "-an argument ['-an %s'] expects 3 or 4 comma-delimited "
                         "parameters!" % ",".join(attribute_args)
                     )
-                if attribute_args[1] == "i":
+                if (attribute_args[1] == "i"
+                    or attribute_args[1] == "lc"):
                     t = 0
                     f = 0
                     try:
@@ -486,7 +488,7 @@ def check_arguments(parser, args):
                             )
                 else:
                     parser.error(
-                        'Please check attribute "%s": type must be one of [i | f]!'
+                        'Please check attribute "%s": type must be one of [i | lc | f]!'
                         % attribute_args[0]
                     )
 
@@ -591,15 +593,17 @@ def check_arguments(parser, args):
             if args.insert_always and (
                 args.protocol != helper.PROTOCOL_NGSI_V2
                 and args.protocol != helper.PROTOCOL_NGSI_LD
+                and args.protocol != helper.PROTOCOL_DIRECT_QL
             ):
                 parser.error(
                     "Insert always scheme [-i/--insert-always] is only valid "
-                    "for NGSI-V2 and NGSI-LD!"
+                    "for NGSI-V2, DIRECT-QL and NGSI-LD!"
                 )
 
             # is there any payload?
             if (
                 args.protocol == helper.PROTOCOL_NGSI_V2
+                or args.protocol == helper.PROTOCOL_DIRECT_QL
                 or args.protocol != helper.PROTOCOL_NGSI_LD
             ):
                 if (

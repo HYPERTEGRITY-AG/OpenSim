@@ -32,11 +32,10 @@ optional arguments:
                         This host-name will be prepended by "https://", if protocol is omitted and appended with
                         "/v2/" (NGSI-V2), "/ngsi-ld/v1" (NGSI-LD) or "/v1.1/" (SensorThings) resp. depending on
                         the server-type (see -p/--protocol).
-  -p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}, --protocol {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP}
+  -p {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP,DIRECT-QL}, --protocol {NGSI-V2,NGSI-LD,SensorThings-MQTT,SensorThings-HTTP,DIRECT-QL}
                         Define the type of server. [Default: NGSI-V2]
-  -i, --insert-always   [Only NGSI-V2 and NGSI-LD!] If set, the contexts will always be inserted (via POST with
-                        option 'upsert') instead of trying to update first (via PATCH) and insert (via POST), if
-                        not existing (i.e. PATCH returns '404 Not Found').
+  -i, --insert-always   [Only NGSI-V2, DIRECT-QL(mandatory) and NGSI-LD!] If set, the contexts will
+                        always be inserted (via POST with option 'upsert') instead of trying to update first (via PATCH) and insert (via POST), if not existing (i.e. PATCH returns '404 Not Found').
   -a id, --datastream-id id
                         [Only SensorThings!] If set, this Datastream-Id will be used for ALL Observations,
                         instead of first searching for the Thing by it's name and the correct Datastream-Id
@@ -62,13 +61,10 @@ optional arguments:
                         If set, limits the frequency of the messages sent to the given number (per thread!).
   -l seconds, --limit-time seconds
                         Only in conjunction with '-u/--unlimited': Stops after the given time in seconds.
-  -y name, --type name  [Only NGSI-V2 and NGSI-LD!] If set, this type-name will be used in the payload.
+  -y name, --type name  [Only NGSI-V2, DIRECT-QL(mandatory) and NGSI-LD!] If set, this type-name will be
+                        used in the payload.
   -an name,type,number[,max-number], --attribute-number name,type,number[,max-number]
-                        Define a number attribute used for the payload by 'name' (The name of the attribute,
-                        e.g.: temperature), 'type' (One of i [integer] or f [floating point])and 'number' (The
-                        value to be used). If 'max-number' is set, the number written will be randomly between
-                        'number' and 'max-number' (each including). Note: Multiple number attributes can be
-                        defined by repeating -an.
+                        Define a number attribute used for the payload by 'name' (The name of the attribute, e.g.: temperature), 'type' (One of i [integer] or lc [linear counter] or f [floating point])and 'number' (The value to be used). If 'max-number' is set, the number written will be randomly between 'number' and 'max-number' (each including). Note: Multiple number attributes can be defined by repeating -an.
   -as name value, --attribute-string name value
                         Define a string attribute used for the payload by 'name' (The name of the attribute,
                         e.g.: instruction) and 'value' (the actual string). Note: Multiple string attributes can
